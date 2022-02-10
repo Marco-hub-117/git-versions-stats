@@ -9,8 +9,8 @@ def init_argparser():
     parser = argparse.ArgumentParser()
     #parser.add_argument('body', action="store", type=str,
     #                    help="Text file containing the body of the message")
-    parser.add_argument('--workdir', '-d', metavar='workdir',
-                        help='Directory containing the git repository.')
+    parser.add_argument('--workdir', '-d', metavar='workdir', default = '.',
+                        help='Directory containing the git repository. Default = "%(default)s"')
     return parser
 
 
@@ -64,13 +64,9 @@ def temp_func(workdir='.'):
 def main():
     parser = init_argparser()
     args = parser.parse_args()
-    if args.workdir is None:
-        workdir = '.'
-    else:
-        workdir = args.workdir
-    temp_func(workdir)
+    workdir = args.workdir
+    #temp_func(workdir)
 
 
 if __name__ == '__main__':
     main()
-
