@@ -11,16 +11,18 @@ def init_argparser():
     #                    help="Text file containing the body of the message")
     parser.add_argument('--workdir', '-d', metavar='workdir', default = '.',
                         help='Directory containing the git repository. Default = "%(default)s"')
+    parser.add_argument('--outputdir', '-o', metavar='outdir', default = './output',
+                            help='Directory containing the output. Default = "%(default)s"')
     return parser
 
+def make_dir(dirName):
+    try:
+        os.mkdir(dirName) # Creo una cartella in cui metterò i file compilati
+    except FileExistsError:
+        print('la cartella {dirName} è già presente')
 
 def temp_func(workdir='.'):
     os.chdir(workdir) # Passo alla directory che contiene il repository
-
-    try:
-        os.mkdir('fileCompilati') # Creo una cartella in cui metterò i file compilati
-    except FileExistsError:
-        print('la cartella è già presente')
 
     # Con la seguente linea di codice chiamo il comando "git reflog".
     # l'output del comando su console sarà salvato in completedProc.stdout
@@ -66,7 +68,7 @@ def main():
     args = parser.parse_args()
     workdir = args.workdir
     #temp_func(workdir)
-
+    outdir = args.outputdir
 
 if __name__ == '__main__':
     main()
