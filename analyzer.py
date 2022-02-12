@@ -4,6 +4,11 @@ import subprocess
 import argparse
 
 
+class CommitInfo:
+    def __init__(self, hex, date):
+        self.hex = hex
+        self.date = date
+
 def init_argparser():
     """Initialize the command line parser."""
     parser = argparse.ArgumentParser()
