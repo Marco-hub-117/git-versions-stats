@@ -33,6 +33,9 @@ def get_all_commit_info(repDirectory):
     """ Return a list of CommitInfo object conteined in repDirectory
         Return an empty list if repDirectory isn't a repository """
     commit_info_list = []
+    if pygit2.discover_repository(repDirectory) is None:
+        return commit_info_list
+
     repo = pygit2.Repository(repDirectory)
     last = repo[repo.head.target]
     for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
@@ -45,6 +48,8 @@ def get_all_commit_info(repDirectory):
 def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
     """ Copy all commited file '.c' contained in repDirectory into outDirectory
         Return True if the copy succeed"""
+    if pygit2.discover_repository(repDirectory) is None:
+            return False
     all_commit_info = get_all_commit_info(repDirectory)
     repo = pygit2.Repository(repDirectory)
     for commit_info in all_commit_info:
