@@ -4,6 +4,8 @@ import subprocess
 import argparse
 import pygit2
 from datetime import datetime
+from pathlib import Path
+from shutil import copy
 
 class CommitInfo:
     def __init__(self, hex, date):
@@ -23,14 +25,15 @@ def init_argparser():
 
 def make_dir(dirName):
     try:
-        os.mkdir(dirName) # Creo una cartella in cui metterò i file compilati
+        os.mkdir(dirName)
     except FileExistsError:
         print('la cartella {dirName} è già presente')
 
 def get_all_commit_info(repDirectory):
-    """ Return a list of CommitInfo object conteined in repDirectory"""
-    repo = pygit2.Repository(repDirectory)
+    """ Return a list of CommitInfo object conteined in repDirectory
+        Return an empty list if repDirectory isn't a repository """
     commit_info_list = []
+    repo = pygit2.Repository(repDirectory)
     last = repo[repo.head.target]
     for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
         date = datetime.fromtimestamp(commit.commit_time)
@@ -38,6 +41,20 @@ def get_all_commit_info(repDirectory):
         commit_info_list.append(commit_info)
 
     return commit_info_list
+
+def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
+    """ Copy all commited file '.c' contained in repDirectory into outDirectory
+        Return True if the copy succeed"""
+    all_commit_info = get_all_commit_info(repDirectory)
+    repo = pygit2.Repository(repDirectory)
+    for commit_info in all_commit_info:
+        repo.checkout_tree(repo.get(commit_info.hex))
+        fileList = list(Path(repDirectory).glob('**/*.c'))
+        for src in fileList:
+            destFilenName = os.path.join(outDirectory,commit_info.date+'_'+commit_info.hex+'.c')
+            copy(src,destFilenName)
+        repo.reset(all_commit_info[0].hex,pygit2.GIT_RESET_HARD)
+    return True
 
 def temp_func(workdir='.'):
     os.chdir(workdir) # Passo alla directory che contiene il repository
@@ -87,6 +104,10 @@ def main():
     workdir = args.workdir
     #temp_func(workdir)
     outdir = args.outputdir
+    if (copy_all_committed_file(workdir,outdir)):
+        print("The copy was succesful")
+    else:
+        print("Copy failed")
 
 if __name__ == '__main__':
     main()
