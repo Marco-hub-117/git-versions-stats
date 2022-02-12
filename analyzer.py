@@ -19,7 +19,7 @@ def init_argparser():
     #                    help="Text file containing the body of the message")
     parser.add_argument('--workdir', '-d', metavar='workdir', default = '.',
                         help='Directory containing the git repository. Default = "%(default)s"')
-    parser.add_argument('--outputdir', '-o', metavar='outdir', default = './output',
+    parser.add_argument('--outputdir', '-o', metavar='outdir', default = './analyzerOutput',
                             help='Directory containing the output. Default = "%(default)s"')
     return parser
 
@@ -49,7 +49,7 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
     """ Copy all commited file '.c' contained in repDirectory into outDirectory
         Return True if the copy succeed"""
     if pygit2.discover_repository(repDirectory) is None:
-            return False
+        return False
     all_commit_info = get_all_commit_info(repDirectory)
     repo = pygit2.Repository(repDirectory)
     for commit_info in all_commit_info:
@@ -69,7 +69,6 @@ def temp_func(workdir='.'):
     for fileName in fileList:
         outName = 'out'+fileName[0:-2]
         subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # compilo il programma
-
 
 def main():
     parser = init_argparser()
