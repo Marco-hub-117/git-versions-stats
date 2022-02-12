@@ -2,7 +2,8 @@ import os
 import io
 import subprocess
 import argparse
-
+import pygit2
+from datetime import datetime
 
 class CommitInfo:
     def __init__(self, hex, date):
@@ -25,6 +26,18 @@ def make_dir(dirName):
         os.mkdir(dirName) # Creo una cartella in cui metterò i file compilati
     except FileExistsError:
         print('la cartella {dirName} è già presente')
+
+def get_all_commit_info(repDirectory):
+    """ Return a list of CommitInfo object conteined in repDirectory"""
+    repo = pygit2.Repository(repDirectory)
+    commit_info_list = []
+    last = repo[repo.head.target]
+    for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
+        date = datetime.fromtimestamp(commit.commit_time)
+        commit_info = CommitInfo(commit.hex,date.strftime("%Y-%m-%d_%H-%M-%S"))
+        commit_info_list.append(commit_info)
+
+    return commit_info_list
 
 def temp_func(workdir='.'):
     os.chdir(workdir) # Passo alla directory che contiene il repository
