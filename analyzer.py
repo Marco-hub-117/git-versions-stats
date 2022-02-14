@@ -5,7 +5,7 @@ import argparse
 import pygit2
 from datetime import datetime
 from pathlib import Path
-from shutil import copy
+import shutil
 
 class CommitInfo:
     def __init__(self, hex, date):
@@ -45,8 +45,9 @@ def get_all_commit_info(repDirectory):
 
     return commit_info_list
 
-def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
+def copy_all_committed_file_not_bare(repDirectory='.',outDirectory='analyzerOutput'):
     """ Copy all commited file '.c' contained in repDirectory into outDirectory
+        repDirectory must contain a non-bare repository
         Return True if the copy succeed"""
     if pygit2.discover_repository(repDirectory) is None:
         return False
@@ -57,9 +58,26 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
         fileList = list(Path(repDirectory).glob('**/*.c'))
         for src in fileList:
             destFilenName = os.path.join(outDirectory,commit_info.date+'_'+commit_info.hex+'.c')
-            copy(src,destFilenName)
+            shutil.copy(src,destFilenName)
         repo.reset(all_commit_info[0].hex,pygit2.GIT_RESET_HARD)
     return True
+
+def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
+    """ Copy all commited file '.c' contained in repDirectory into outDirectory
+        repDirectory could be a bare repository
+        Return True if the copy succeed"""
+    if pygit2.discover_repository(repDirectory) is None:
+        return False
+    repo = pygit2.Repository(repDirectory)
+    if repo.is_bare:
+        tempDir = "tempRepositoryDir"
+        Path(tempDir).mkdir(parents = True)
+        repo_not_bare = pygit2.clone_repository(repo.path,tempDir)
+        resultBool = copy_all_committed_file_not_bare(tempDir, outDirectory)
+        shutil.rmtree(tempDir)
+        return resultBool
+    else:
+        return copy_all_committed_file_not_bare(repDirectory, outDirectory)
 
 def temp_func(workdir='.'):
 
