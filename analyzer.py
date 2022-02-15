@@ -6,6 +6,7 @@ import pygit2
 from datetime import datetime
 from pathlib import Path
 import shutil
+import tempfile
 
 class CommitInfo:
     def __init__(self, hex, date):
@@ -70,12 +71,9 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
         return False
     repo = pygit2.Repository(repDirectory)
     if repo.is_bare:
-        tempDir = "tempRepositoryDir"
-        Path(tempDir).mkdir(parents = True)
-        repo_not_bare = pygit2.clone_repository(repo.path,tempDir)
-        resultBool = copy_all_committed_file_not_bare(tempDir, outDirectory)
-        shutil.rmtree(tempDir)
-        return resultBool
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            repo_not_bare = pygit2.clone_repository(repo.path,tmpdirname)
+            return copy_all_committed_file_not_bare(tmpdirname, outDirectory)
     else:
         return copy_all_committed_file_not_bare(repDirectory, outDirectory)
 
