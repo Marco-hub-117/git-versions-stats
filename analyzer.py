@@ -53,6 +53,9 @@ def copy_all_committed_file_not_bare(repDirectory='.',outDirectory='analyzerOutp
         Return True if the copy succeed"""
     if pygit2.discover_repository(repDirectory) is None:
         return False
+    if (not Path(outDirectory).exists()):
+        make_dir(outDirectory)
+    
     all_commit_info = get_all_commit_info(repDirectory)
     repo = pygit2.Repository(repDirectory)
     for commit_info in all_commit_info:
