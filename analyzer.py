@@ -27,7 +27,7 @@ def init_argparser():
 
 def make_dir(dirName):
     try:
-        os.mkdir(dirName)
+        os.makedirs(dirName)
     except FileExistsError:
         print('la cartella {dirName} è già presente')
 
@@ -55,7 +55,6 @@ def copy_all_committed_file_not_bare(repDirectory='.',outDirectory='analyzerOutp
         return False
     if (not Path(outDirectory).exists()):
         make_dir(outDirectory)
-    
     all_commit_info = get_all_commit_info(repDirectory)
     repo = pygit2.Repository(repDirectory)
     for commit_info in all_commit_info:
