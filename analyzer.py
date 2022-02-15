@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 import shutil
 import tempfile
+import glob
 
 class CommitInfo:
     def __init__(self, hex, date):
@@ -77,14 +78,19 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
     else:
         return copy_all_committed_file_not_bare(repDirectory, outDirectory)
 
-def temp_func(workdir='.'):
-
-    os.chdir('./fileCompilati')
-    fileList = os.listdir('./') # ottengo i nomi di tutti i file ottenuti grazie ai comandi git sopra
-
+def compile_file(workdir):
+    """
+        Compile all .c file contained in workdir and put them into compiled_file
+        directory contained in workdir directory.
+    """
+    # filList will contain the name of all file .c contained in workdir
+    fileList = glob.glob(os.path.join(workdir,"*.c"))
+    outDirName = os.path.join(workdir,"compiled_file")
+    make_dir(outDirName) # create directory that will contain compiled file
     for fileName in fileList:
-        outName = 'out'+fileName[0:-2]
-        subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # compilo il programma
+        baseFileName = os.path.basename(fileName)
+        outName = os.path.join(outDirName,baseFileName[0:-2])
+        subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
 
 def main():
     parser = init_argparser()
@@ -96,6 +102,8 @@ def main():
         print("The copy was succesful")
     else:
         print("Copy failed")
+
+    compile_file(outdir)
 
 if __name__ == '__main__':
     main()
