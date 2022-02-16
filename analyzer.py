@@ -57,11 +57,13 @@ def copy_all_committed_file_not_bare(repDirectory='.',outDirectory='analyzerOutp
         make_dir(outDirectory)
     all_commit_info = get_all_commit_info(repDirectory)
     repo = pygit2.Repository(repDirectory)
+    source_dir_name = "source_file"
+    make_dir(os.path.join(outDirectory, source_dir_name))
     for commit_info in all_commit_info:
         repo.checkout_tree(repo.get(commit_info.hex))
         fileList = list(Path(repDirectory).glob('**/*.c'))
         for src in fileList:
-            destFilenName = os.path.join(outDirectory,commit_info.date+'_'+commit_info.hex+'.c')
+            destFilenName = os.path.join(outDirectory, source_dir_name, commit_info.date+'_'+commit_info.hex+'.c')
             shutil.copy(src,destFilenName)
         repo.reset(all_commit_info[0].hex,pygit2.GIT_RESET_HARD)
     return True
@@ -79,20 +81,6 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
             return copy_all_committed_file_not_bare(tmpdirname, outDirectory)
     else:
         return copy_all_committed_file_not_bare(repDirectory, outDirectory)
-
-def compile_file(workdir):
-    """
-        Compile all .c file contained in workdir and put them into compiled_file
-        directory contained in workdir directory.
-    """
-    # fileList will contain the name of all file .c contained in workdir
-    fileList = glob.glob(os.path.join(workdir,"*.c"))
-    outDirName = os.path.join(workdir,"compiled_file")
-    make_dir(outDirName) # create directory that will contain compiled file
-    for fileName in fileList:
-        baseFileName = os.path.basename(fileName)
-        outName = os.path.join(outDirName,baseFileName[0:-2])
-        subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
 
 def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='analyzerOutput'):
     """
@@ -114,6 +102,20 @@ def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='anal
 
         outName = os.path.join(outDirectory,repPath.name)
         copy_all_committed_file(repPath, outName)
+
+def compile_file(workdir):
+    """
+        Compile all .c file contained in workdir and put them into compiled_file
+        directory contained in workdir directory.
+    """
+    # fileList will contain the name of all file .c contained in workdir
+    fileList = glob.glob(os.path.join(workdir,"**/*.c"), recursive=True)
+    outDirName = os.path.join(workdir,"compiled_file")
+    make_dir(outDirName) # create directory that will contain compiled file
+    for fileName in fileList:
+        baseFileName = os.path.basename(fileName)
+        outName = os.path.join(outDirName,baseFileName[0:-2])
+        subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
 
 def compile_all_file(workdir):
     """
