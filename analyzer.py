@@ -130,12 +130,8 @@ def main():
     workdir = args.workdir
     #temp_func(workdir)
     outdir = args.outputdir
-    if (copy_all_committed_file(workdir,outdir)):
-        print("The copy was succesful")
-    else:
-        print("Copy failed")
-
-    compile_file(outdir)
+    copy_all_commit_from_all_repository(workdir, outdir)
+    compile_all_file(outdir)
 
 if __name__ == '__main__':
     main()
