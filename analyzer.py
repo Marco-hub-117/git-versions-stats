@@ -115,6 +115,15 @@ def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='anal
         outName = os.path.join(outDirectory,repPath.name)
         copy_all_committed_file(repPath, outName)
 
+def compile_all_file(workdir):
+    """
+        Compile all .c file contained in all sub-directory of workdir
+        and put them into compiled_file directory contained in all
+        sub-directory of workdir.
+    """
+    for sourceFilePath in Path(workdir).iterdir():
+        compile_file(sourceFilePath)
+
 def main():
     parser = init_argparser()
     args = parser.parse_args()
