@@ -20,7 +20,7 @@ def init_argparser():
     #parser.add_argument('body', action="store", type=str,
     #                    help="Text file containing the body of the message")
     parser.add_argument('--workdir', '-d', metavar='workdir', default = '.',
-                        help='Directory containing the git repository. Default = "%(default)s"')
+                        help='Directory containing the git repositoies. Default = "%(default)s"')
     parser.add_argument('--outputdir', '-o', metavar='outdir', default = './analyzerOutput',
                             help='Directory containing the output. Default = "%(default)s"')
     return parser
@@ -85,7 +85,7 @@ def compile_file(workdir):
         Compile all .c file contained in workdir and put them into compiled_file
         directory contained in workdir directory.
     """
-    # filList will contain the name of all file .c contained in workdir
+    # fileList will contain the name of all file .c contained in workdir
     fileList = glob.glob(os.path.join(workdir,"*.c"))
     outDirName = os.path.join(workdir,"compiled_file")
     make_dir(outDirName) # create directory that will contain compiled file
@@ -93,6 +93,27 @@ def compile_file(workdir):
         baseFileName = os.path.basename(fileName)
         outName = os.path.join(outDirName,baseFileName[0:-2])
         subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
+
+def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='analyzerOutput'):
+    """
+        Copy al committed .c file contained in every repository contained
+        in directoryWithReps argument.
+        it will copy in outDirectory/{repositoryName}
+        keeping the name of every repository contained in directoryWithReps
+    """
+    #print(list(Path(directoryWithReps).glob("*")))
+    for repPath in Path(directoryWithReps).iterdir():
+        if not repPath.is_dir():
+            continue
+        if pygit2.discover_repository(repPath) is None:
+            continue
+        if os.path.basename(repPath) == ".git":
+            # the following instruction replace repPath with the parent directroy
+            # that contain the git repository, only if repPath is .git directory
+            repPath = Path(os.path.dirname(repPath))
+
+        outName = os.path.join(outDirectory,repPath.name)
+        copy_all_committed_file(repPath, outName)
 
 def main():
     parser = init_argparser()
