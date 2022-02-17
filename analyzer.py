@@ -89,7 +89,8 @@ def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='anal
         it will copy in outDirectory/{repositoryName}
         keeping the name of every repository contained in directoryWithReps
     """
-    #print(list(Path(directoryWithReps).glob("*")))
+    if directoryWithReps == '.':
+        directoryWithReps = os.getcwd()
     for repPath in Path(directoryWithReps).iterdir():
         if not repPath.is_dir():
             continue
