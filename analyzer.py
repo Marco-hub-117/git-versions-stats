@@ -73,14 +73,11 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
         repDirectory could be a bare repository
         Return True if the copy succeed"""
     if pygit2.discover_repository(repDirectory) is None:
-        return False
+         return False
     repo = pygit2.Repository(repDirectory)
-    if repo.is_bare:
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            repo_not_bare = pygit2.clone_repository(repo.path,tmpdirname)
-            return copy_all_committed_file_not_bare(tmpdirname, outDirectory)
-    else:
-        return copy_all_committed_file_not_bare(repDirectory, outDirectory)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        repo_not_bare = pygit2.clone_repository(repo.path,tmpdirname)
+        return copy_all_committed_file_not_bare(tmpdirname, outDirectory)
 
 def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='analyzerOutput'):
     """
@@ -131,7 +128,6 @@ def main():
     parser = init_argparser()
     args = parser.parse_args()
     workdir = args.workdir
-    #temp_func(workdir)
     outdir = args.outputdir
     copy_all_commit_from_all_repository(workdir, outdir)
     compile_all_file(outdir)
