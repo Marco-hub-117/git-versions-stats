@@ -29,7 +29,7 @@ def make_dir(dirName):
     try:
         os.makedirs(dirName)
     except FileExistsError:
-        print('la cartella {dirName} è già presente')
+        print(f'la cartella {dirName} è già presente')
 
 def get_all_commit_info(repDirectory):
     """ Return a list of CommitInfo object conteined in repDirectory
@@ -113,7 +113,8 @@ def compile_file(workdir):
     for fileName in fileList:
         baseFileName = os.path.basename(fileName)
         outName = os.path.join(outDirName,baseFileName[0:-2])
-        subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
+        completedProc = subprocess.run(['gcc', '-Wall', fileName, '-o', outName]) # program compile
+        print("RETURN CODE = ",completedProc.returncode)
 
 def compile_all_file(workdir):
     """
