@@ -86,6 +86,35 @@ def get_date_from_file_name(fileName):
     fileNameParts = fileName.split('_')
     return fileNameParts[0] + '_' + fileNameParts[1]
 
+def get_row_from_url(url):
+    """
+        Return a list containing all information retieved from the moss web page
+        row has the following format:
+        ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
+            'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
+    """
+    df_list = pd.read_html(url) # this parses all the tables in webpages to a list
+    df = df_list[0] # select the first table, wich contains the value i need
+    values = df.values  # return a ndarray containing the value i need
+    # values[0] contain the firs row containing the value i need
+    try:
+        file1 = values[0][0]
+        file2 = values[0][1]
+        lineMatch = values [0][2]
+    except IndexError as ind_err:
+        print("errore nell'indice a riga 120, passo al prossimo")
+        return None
+    except Exception as e:
+        print(str(e))
+        return None
+
+    print(file1, file2, lineMatch)
+    row = [file1.split(' ')[0], file2.split(' ')[0],
+        get_date_from_file_name(file1), get_date_from_file_name(file2),
+        url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
+
+    return row
+
 def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_compare'):
     """
         create a csv file into resultDir containing information retrieved
@@ -112,24 +141,10 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
         for secondFile in secondFileList:
             url = init_moss_and_send(firstFile, secondFile)
             print()
-            df_list = pd.read_html(url) # this parses all the tables in webpages to a list
-            df = df_list[0] # select the first table, wich contains the value i need
-            values = df.values  # return a ndarray containing the value i need
-            # values[0] contain the firs row containing the value i need
-            try:
-                file1 = values[0][0]
-                file2 = values[0][1]
-                lineMatch = values [0][2]
-            except IndexError as ind_err:
-                print("errore nell'indice a riga 120, passo al prossimo")
+            row = get_row_from_url(url)
+            if row is None:
                 continue
-            except Exception as e:
-                print(str(e))
 
-            print(file1, file2, lineMatch)
-            row = [file1.split(' ')[0], file2.split(' ')[0],
-                get_date_from_file_name(file1), get_date_from_file_name(file2),
-                url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
             add_row_to_csv(csvFilePath, row)
 
 
