@@ -44,24 +44,40 @@ def init_csv_file(destDirectory, fileName, field):
 
     return destFile
 
-def init_moss_and_send(firstFile, secondFile, lang = 'c'):
+def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
     """
         Init a mosspy.Moss object and send the comparison between
-        firstfile and secondfile.
+        all file contained in firstFileList and secondoFileList.
         return the result url
     """
     m = mosspy.Moss(userid, lang)
-    m.addFile(firstFile)
-    m.addFile(secondFile)
-    return m.send(lambda file_path, display_name: print('*', end='', flush=True))
+    m.setIgnoreLimit(250)
+    m.setNumberOfMatchingFiles(500)
 
-def add_row_to_csv(csvFileName, row):
+    for file in firstFileList:
+        m.addFile(file)
+    for file in secondFileList:
+        m.addFile(file)
+
+    try:
+        result_url = m.send(lambda file_path, display_name: print('*', end='', flush=True))
+    except:
+        # Questo blocco l´ho aggiunto perchè mi ha dato l'errore:
+        # ConnectionResetError: [Errno 104] Connection reset by peer
+        # Ma solo ogni tanto lo fa, non so come risolvere
+        print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0])
+        result_url = None
+
+    return result_url
+
+def add_rows_to_csv(csvFileName, rows):
     """
-        append the row passed into csvFileName
+        append all rows passed into csvFileName
     """
     with open(csvFileName, 'a', newline = '') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(row)
+        for row in rows:
+            writer.writerow(row)
 
 def get_perc_from_value(value):
     """
@@ -86,41 +102,40 @@ def get_date_from_file_name(fileName):
     fileNameParts = fileName.split('_')
     return fileNameParts[0] + '_' + fileNameParts[1]
 
-def get_row_from_url(url):
+def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup):
     """
-        Return a list containing all information retieved from the moss web page
-        row has the following format:
+        Return a nested list containing all valid information
+        retieved from the moss web page.
+        The result list will contain the comparison result between all file
+        contained in firstFileGroup compared with the ones contained in secondFileGroup
+        Each row has the following format:
         ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
             'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
     """
     df_list = pd.read_html(url) # this parses all the tables in webpages to a list
     df = df_list[0] # select the first table, wich contains the value i need
     values = df.values  # return a ndarray containing the value i need
-    # values[0] contain the firs row containing the value i need
-    try:
-        file1 = values[0][0]
-        file2 = values[0][1]
-        lineMatch = values [0][2]
-    except IndexError as ind_err:
-        print("errore nell'indice a riga 120, passo al prossimo")
-        return None
-    except Exception as e:
-        print(str(e))
-        return None
+    valid_rows = []
+    for value in values:
+        file1 = value[0]
+        file2 = value[1]
+        lineMatch = value[2]
+        if ((file1.split(' ')[0] in firstFileGroup) and (file2.split(' ')[0] in secondFileGroup)):
+            print(file1, file2, lineMatch, sep = '|||')
+            row = [file1.split(' ')[0], file2.split(' ')[0],
+                get_date_from_file_name(file1), get_date_from_file_name(file2),
+                url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
+            valid_rows.append(row)
 
-    print(file1, file2, lineMatch)
-    row = [file1.split(' ')[0], file2.split(' ')[0],
-        get_date_from_file_name(file1), get_date_from_file_name(file2),
-        url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
+    return valid_rows
 
-    return row
 
 def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_compare'):
     """
         create a csv file into resultDir containing information retrieved
         from moss web page. It will contain information between the comparison
         of all .c file contained into firstDir and secondDir.
-        The csv fil has the following field:
+        The csv file has the following field:
         ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
             'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
     """
@@ -137,15 +152,22 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    for firstFile in firstFileList:
-        for secondFile in secondFileList:
-            url = init_moss_and_send(firstFile, secondFile)
+    n = 15
+    for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
+        for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
+            url = init_moss_and_send(firstFileGroup, secondFileGroup)
             print()
-            row = get_row_from_url(url)
-            if row is None:
+            print(url)
+            if (url is None):
                 continue
+            rows = get_valid_rows_from_url(url, firstFileGroup, secondFileGroup)
+            add_rows_to_csv(csvFilePath, rows)
 
-            add_row_to_csv(csvFilePath, row)
+            # row = get_row_from_url(url)
+            # if row is None:
+            #     continue
+            #
+            # add_row_to_csv(csvFilePath, row)
 
 
 def main():
