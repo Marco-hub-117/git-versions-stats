@@ -129,6 +129,31 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup):
 
     return valid_rows
 
+def get_N_elements_from_list(list, N = 50, sort = False):
+    """
+        Return a list containing N elements from the list passed.
+        If N is greater than the number of elements of the list passed,
+        return the original list.
+        If sort is True return a reverse sorted list
+    """
+
+    if (sort):
+        list.sort(reverse = True)
+    if (N >= len(list)):
+        return list
+
+    resultList = []
+    i = 0
+    multiplier = len(list) / N
+    currentIndex = 0
+    while (currentIndex < len(list)):
+        resultList.append(list[currentIndex])
+        i += 1
+        currentFloatIndex = (i * multiplier)
+        currentIndex = int (currentFloatIndex // 1)
+
+    return resultList
+
 
 def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_compare'):
     """
@@ -140,10 +165,10 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
             'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
     """
     # init all variable needed
-    firstFileList = glob.glob(os.path.join(firstDir,'**/*.c'), recursive = True)
-    secondFileList = glob.glob(os.path.join(secondDir,'**/*.c'), recursive = True)
-    firstFileList.sort(reverse = True)
-    secondFileList.sort(reverse = True)
+    firstAllFileList = glob.glob(os.path.join(firstDir,'**/*.c'), recursive = True)
+    secondAllFileList = glob.glob(os.path.join(secondDir,'**/*.c'), recursive = True)
+    firstAllFileList.sort(reverse = True)
+    secondAllFileList.sort(reverse = True)
     # init result dir and csv file
     make_dir(resultDir)
     field = ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
@@ -152,7 +177,11 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    n = 15
+    N = 50
+    firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
+    secondFileList = get_N_elements_from_list(secondFileList, N, sort = True)
+
+    n = 15 # number of element in each group
     for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
         for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
             url = init_moss_and_send(firstFileGroup, secondFileGroup)
@@ -173,11 +202,11 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
 def main():
     parser = init_argparser()
     args = parser.parse_args()
-    firstdir = args.firstdir
-    seconddir = args.seconddir
+    firstDir = args.firstdir
+    secondDir = args.seconddir
     outdir = args.outdir
 
-    compare_with_moss_all_file(firstdir, seconddir, outdir)
+    compare_with_moss_all_file(firstDir, secondDir, outdir)
 
 
 if __name__ == '__main__':
