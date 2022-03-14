@@ -179,7 +179,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
 
     N = 50
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
-    secondFileList = get_N_elements_from_list(secondFileList, N, sort = True)
+    secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
 
     n = 15 # number of element in each group
     for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
