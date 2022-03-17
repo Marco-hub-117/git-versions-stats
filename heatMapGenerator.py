@@ -2,8 +2,9 @@ import csv
 import argparse
 from datetime import datetime
 import numpy as np
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 def init_argparser():
     """Initialize the command line parser."""
@@ -21,8 +22,10 @@ def get_date_lists(csvFileToRead):
         reader = csv.reader(csvfile)
         firstDateList = []
         secondDateList = []
+        field = next(reader)
 
         for row in reader:
+
             if (not row[2] in firstDateList):
                 firstDateList.append(row[2])
             if (not row[3] in secondDateList):
@@ -32,6 +35,34 @@ def get_date_lists(csvFileToRead):
         secondDateList.sort(reverse = True)
 
         return firstDateList, secondDateList
+
+def get_sim_matrices(csvFileToRead):
+
+    firstDateList, secondDateList = get_date_lists(csvFileToRead)
+    simMeanMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+    simOneMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+    simTwoMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+
+    print(simMeanMatrix.shape)
+
+    with open(csvFileToRead, newline = '') as csvfile:
+        csvLineList = list(csv.reader(csvfile))
+
+        for i in range (0, len(firstDateList)):
+            for j in range(0, len(secondDateList)):
+                for row in csvLineList:
+                    if (firstDateList[i] == row[2] and secondDateList[j] == row[3]):
+                        simMeanMatrix[i][j] = (float(row[5]) + float(row[6])) / 2
+                        simOneMatrix[i][j] = float(row[5])
+                        simTwoMatrix[i][j] = float(row[6])
+                        break
+
+    print(simMeanMatrix)
+    print(simOneMatrix)
+    print(simTwoMatrix)
+
+    return simMeanMatrix, simOneMatrix, simTwoMatrix
+
 
 def heatmap(data, row_labels, col_labels, ax=None,
             cbar_kw={}, cbarlabel="", **kwargs):
@@ -155,29 +186,21 @@ def main():
 
     firstDateList, secondDateList = get_date_lists(destFile)
 
-    print(firstDateList)
-    print(secondDateList)
+    percSimMatrix = get_sim_matrices(destFile)
 
-    print(len(firstDateList))
-    print(len(secondDateList))
+    fig, ax = plt.subplots()
 
-    percSimMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+    cmap = mpl.colors.ListedColormap(["aquamarine", "lime", "gold", "darkorange", "darkred"])
 
-    print(percSimMatrix.shape)
-
-    for i in range (0, len(firstDateList)):
-        for j in range(0, len(secondDateList)):
-            percSimMatrix[i][j] = j
-
-    print(percSimMatrix)
-    # fig, ax = plt.subplots()
-    #
-    # im, cbar = heatmap(percSimMatrix, firstDateList, secondDateList, ax=ax,
-    #                    cmap="YlGn", cbarlabel="Percentage similarity [%]")
-    # texts = annotate_heatmap(im, valfmt="{x:.1f} t")
-    #
-    # fig.tight_layout()
-    # plt.show()
+    im, cbar = heatmap(percSimMatrix[0], firstDateList, secondDateList, ax=ax,
+                       cmap=cmap, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage similarity [%]")
+    # texts = annotate_heatmap(im, valfmt="{x:.1f}")
+    font = {'weight': 'semibold',
+            'size': 'xx-large'
+            }
+    title = fig.suptitle(Path(destFile).name+' - MEAN', verticalalignment = "center", fontproperties = font )
+    title.set(color = 'darkred')
+    plt.show()
 
 
 
