@@ -177,7 +177,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    N = 50
+    N = 100
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
     secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
 
