@@ -6,6 +6,9 @@ from pathlib import Path
 import pandas as pd
 import csv
 import re
+import time
+import subprocess
+from supportModules.sendMossRequest import MossHandlingThread
 
 userid = 719337169
 
@@ -50,23 +53,33 @@ def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
         all file contained in firstFileList and secondoFileList.
         return the result url
     """
-    m = mosspy.Moss(userid, lang)
-    m.setIgnoreLimit(250)
-    m.setNumberOfMatchingFiles(500)
+    retries = 10
+    timeout = 5 # timeout entity in seconds
+    while True:
+        m = mosspy.Moss(userid, lang)
+        m.setIgnoreLimit(420)
+        m.setNumberOfMatchingFiles(1000)
 
-    for file in firstFileList:
-        m.addFile(file)
-    for file in secondFileList:
-        m.addFile(file)
+        for file in firstFileList:
+            m.addFile(file)
+        for file in secondFileList:
+            m.addFile(file)
 
-    try:
-        result_url = m.send(lambda file_path, display_name: print('*', end='', flush=True))
-    except:
-        # Questo blocco l´ho aggiunto perchè mi ha dato l'errore:
-        # ConnectionResetError: [Errno 104] Connection reset by peer
-        # Ma solo ogni tanto lo fa, non so come risolvere
-        print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0])
-        result_url = None
+        try:
+            result_url = m.send(lambda file_path, display_name: print('*', end='', flush=True))
+            break
+        except:
+            # Questo blocco l´ho aggiunto perchè mi ha dato l'errore:
+            # ConnectionResetError: [Errno 104] Connection reset by peer
+            # Ma solo ogni tanto lo fa, non so come risolvere
+            retries -= 1
+            result_url = None
+            time.sleep(5.0)
+            if retries < 0:
+                print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0], 'ANNULLO')
+                break
+            else:
+                print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0], 'RIPROVO')
 
     return result_url
 
@@ -112,7 +125,20 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup):
         ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
             'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
     """
-    df_list = pd.read_html(url) # this parses all the tables in webpages to a list
+    retries = 10
+    while True:
+        try:
+            df_list = pd.read_html(url) # this parses all the tables in webpages to a list
+            break
+        except:
+            retries -= 1
+            if retries > 0:
+                print(f'errore nel caricamento della pagina {url}, RIPROVO')
+                time.sleep(5.0)
+            else:
+                print(f'errore nel caricamento della pagina {url}, tentativi finiti, ANNULLO')
+                return []
+
     df = df_list[0] # select the first table, wich contains the value i need
     values = df.values  # return a ndarray containing the value i need
     valid_rows = []
@@ -177,26 +203,39 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    N = 100
+    N = 160
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
     secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
 
-    n = 15 # number of element in each group
+    n = 20 # number of element in each group
     for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
         for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
-            url = init_moss_and_send(firstFileGroup, secondFileGroup)
-            print()
-            print(url)
-            if (url is None):
-                continue
-            rows = get_valid_rows_from_url(url, firstFileGroup, secondFileGroup)
-            add_rows_to_csv(csvFilePath, rows)
-
-            # row = get_row_from_url(url)
-            # if row is None:
+            # url = init_moss_and_send(firstFileGroup, secondFileGroup)
+            # print()
+            # print(url)
+            # if (url is None):
             #     continue
-            #
-            # add_row_to_csv(csvFilePath, row)
+            retries = 2
+            while True:
+                mossThread = MossHandlingThread(firstFileGroup, secondFileGroup)
+                mossThread.start()
+                mossThread.join(300.0)
+                print(mossThread.result_url)
+                print()
+                if mossThread.result_url == None:
+                    retries -= 1
+                    if (retries > 0):
+                        continue
+                    else:
+                        break
+                else:
+                    break
+
+            if mossThread.result_url == None:
+                print(f"ERRORE, gruppo {firstFileGroup[0]}__{secondFileGroup[0]}")
+                continue
+            rows = get_valid_rows_from_url(mossThread.result_url, firstFileGroup, secondFileGroup)
+            add_rows_to_csv(csvFilePath, rows)
 
 
 def main():
