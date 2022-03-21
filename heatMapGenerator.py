@@ -37,6 +37,14 @@ def get_date_lists(csvFileToRead):
         return firstDateList, secondDateList
 
 def get_sim_matrices(csvFileToRead):
+    """ Return tree matrices containing the similiraity percentage result
+        retireved from the csv file passed.
+        The first matrix contain the mean between the two percentage
+        the second contain the similarity percentage of the first file
+        compared to the second, while the third matrix contain the similarity
+        percentage of the second file compared to the first.
+
+    """
 
     firstDateList, secondDateList = get_date_lists(csvFileToRead)
     simMeanMatrix = np.zeros((len(firstDateList), len(secondDateList)))
@@ -99,8 +107,8 @@ def heatmap(data, row_labels, col_labels, ax=None,
     cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
 
     # Show all ticks and label them with the respective list entries.
-    ax.set_xticks(np.arange(data.shape[1]), labels=col_labels)
-    ax.set_yticks(np.arange(data.shape[0]), labels=row_labels)
+    ax.set_xticks(np.arange(data.shape[1]), labels=col_labels, fontsize = 'small')
+    ax.set_yticks(np.arange(data.shape[0]), labels=row_labels, fontsize = 'small')
 
     # Let the horizontal axes labeling appear on top.
     ax.tick_params(top=True, bottom=False,
@@ -111,11 +119,11 @@ def heatmap(data, row_labels, col_labels, ax=None,
              rotation_mode="anchor")
 
     # Turn spines off and create white grid.
-    ax.spines[:].set_visible(False)
+    # ax.spines[:].set_visible(False)
 
     ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
     ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
-    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+    ax.grid(which="minor", color="w", linestyle='-', linewidth=0.5)
     ax.tick_params(which="minor", bottom=False, left=False)
 
     return im, cbar
@@ -165,7 +173,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
     # Get the formatter in case a string is supplied
     if isinstance(valfmt, str):
-        valfmt = matplotlib.ticker.StrMethodFormatter(valfmt)
+        valfmt = mpl.ticker.StrMethodFormatter(valfmt)
 
     # Loop over the data and create a `Text` for each "pixel".
     # Change the text's color depending on the data.
@@ -190,10 +198,14 @@ def main():
 
     fig, ax = plt.subplots()
 
-    cmap = mpl.colors.ListedColormap(["aquamarine", "lime", "gold", "darkorange", "darkred"])
+    cmap = mpl.colors.ListedColormap(["lightcyan", "aquamarine", "springgreen",
+                                    "greenyellow", "yellow", "gold", "darkorange",
+                                    "orangered", "red", "darkred"])
+
+    cbar_kw = { 'ticks': [x for x in range(0,110,10)], 'drawedges': True }
 
     im, cbar = heatmap(percSimMatrix[0], firstDateList, secondDateList, ax=ax,
-                       cmap=cmap, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage similarity [%]")
+                       cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage similarity [%]")
     # texts = annotate_heatmap(im, valfmt="{x:.1f}")
     font = {'weight': 'semibold',
             'size': 'xx-large'
