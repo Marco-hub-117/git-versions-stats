@@ -192,6 +192,8 @@ def main():
     args = parser.parse_args()
     destFile = args.filetoread
 
+    csvFileName = (Path(destFile).name).split('.')[0]
+
     firstDateList, secondDateList = get_date_lists(destFile)
 
     percSimMatrix = get_sim_matrices(destFile)
@@ -206,12 +208,16 @@ def main():
 
     im, cbar = heatmap(percSimMatrix[0], firstDateList, secondDateList, ax=ax,
                        cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage similarity [%]")
-    # texts = annotate_heatmap(im, valfmt="{x:.1f}")
+    # texts = annotate_heatmap(im, valfmt="{x:.1f}", size = 6.0, threshold = 60.0)
     font = {'weight': 'semibold',
-            'size': 'xx-large'
+            'size': '24.0'
             }
-    title = fig.suptitle(Path(destFile).name+' - MEAN', verticalalignment = "center", fontproperties = font )
+    title = fig.suptitle(csvFileName+' - MEAN', verticalalignment = "center", fontproperties = font )
     title.set(color = 'darkred')
+
+    ax.set_ylabel(csvFileName.split('_')[0], color = 'mediumblue', fontsize = 20.0)
+    ax.set_xlabel(csvFileName.split('_')[1], color = 'mediumblue', fontsize = 20.0)
+
     plt.show()
 
 
