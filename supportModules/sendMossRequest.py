@@ -26,7 +26,7 @@ def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
     timeout = 5 # timeout entity in seconds
     while True:
         m = mosspy.Moss(userid, lang)
-        m.setIgnoreLimit(420)
+        m.setIgnoreLimit(( len(firstFileList)*len(secondFileList) ) + 10)
         m.setNumberOfMatchingFiles(1000)
 
         for file in firstFileList:
