@@ -41,47 +41,20 @@ def init_csv_file(destDirectory, fileName, field):
 
     destFile = os.path.join(destDirectory,fileName)
 
-    with open(destFile, 'w', newline = '') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(field)
+    if os.path.isfile(destFile):
+        overwrite = input(f'Do you want to overwrite the file {destFile}? \n(ok, y, yes) per confermare\n')
+        if overwrite in ['ok', 'y', 'yes']:
+            with open(destFile, 'w', newline = '') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(field)
+            print(f'File {destFile} overwritten')
+    else:
+        print(f'init a new csv file: {destFile}')
+        with open(destFile, 'w', newline = '') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(field)
 
     return destFile
-
-def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
-    """
-        Init a mosspy.Moss object and send the comparison between
-        all file contained in firstFileList and secondoFileList.
-        return the result url
-    """
-    retries = 10
-    timeout = 5 # timeout entity in seconds
-    while True:
-        m = mosspy.Moss(userid, lang)
-        m.setIgnoreLimit(420)
-        m.setNumberOfMatchingFiles(1000)
-
-        for file in firstFileList:
-            m.addFile(file)
-        for file in secondFileList:
-            m.addFile(file)
-
-        try:
-            result_url = m.send(lambda file_path, display_name: print('*', end='', flush=True))
-            break
-        except:
-            # Questo blocco l´ho aggiunto perchè mi ha dato l'errore:
-            # ConnectionResetError: [Errno 104] Connection reset by peer
-            # Ma solo ogni tanto lo fa, non so come risolvere
-            retries -= 1
-            result_url = None
-            time.sleep(5.0)
-            if retries < 0:
-                print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0], 'ANNULLO')
-                break
-            else:
-                print("Errore nell'invio del gruppo:", firstFileList[0], secondFileList[0], 'RIPROVO')
-
-    return result_url
 
 def add_rows_to_csv(csvFileName, rows):
     """
@@ -207,7 +180,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
     secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
 
-    n = 20 # number of element in each group
+    n = 16 # number of element in each group
     for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
         for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
             # url = init_moss_and_send(firstFileGroup, secondFileGroup)
