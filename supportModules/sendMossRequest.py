@@ -16,6 +16,25 @@ class MossHandlingThread(Thread):
     def run(self):
         self.result_url = init_moss_and_send(self.firstFileList, self.secondFileList, self.lang)
 
+def summation(N):
+    if N <= 0:
+        return 0
+
+    summation = 0
+    for x in range(1, N+1):
+        summation += x
+
+    return summation
+
+def get_ignore_limit(firstLen, secondLen):
+
+    usefulComparison = firstLen*secondLen
+    totalComparison = summation(firstLen+secondLen-1)
+    unnecessaryComparison = totalComparison - usefulComparison
+
+    return max(usefulComparison, unnecessaryComparison) + 10
+
+
 def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
     """
         Init a mosspy.Moss object and send the comparison between
@@ -26,7 +45,7 @@ def init_moss_and_send(firstFileList, secondFileList, lang = 'c'):
     timeout = 5 # timeout entity in seconds
     while True:
         m = mosspy.Moss(userid, lang)
-        m.setIgnoreLimit(( len(firstFileList)*len(secondFileList) ) + 10)
+        m.setIgnoreLimit(get_ignore_limit(len(firstFileList), len(secondFileList)))
         m.setNumberOfMatchingFiles(1000)
 
         for file in firstFileList:
