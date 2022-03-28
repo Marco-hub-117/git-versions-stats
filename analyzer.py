@@ -20,7 +20,7 @@ def init_argparser():
     #parser.add_argument('body', action="store", type=str,
     #                    help="Text file containing the body of the message")
     parser.add_argument('--workdir', '-d', metavar='workdir', default = '.',
-                        help='Directory containing the git repositoies. Default = "%(default)s"')
+                        help='Directory containing the git repositories. Default = "%(default)s"')
     parser.add_argument('--outputdir', '-o', metavar='outdir', default = './analyzerOutput',
                             help='Directory containing the output. Default = "%(default)s"')
     return parser
@@ -47,37 +47,34 @@ def get_all_commit_info(repDirectory):
 
     return commit_info_list
 
-def copy_all_committed_file_not_bare(repDirectory='.',outDirectory='analyzerOutput'):
-    """ Copy all commited file '.c' contained in repDirectory into outDirectory
-        repDirectory must contain a non-bare repository
-        Return True if the copy succeed"""
-    if pygit2.discover_repository(repDirectory) is None:
-        return False
-    if (not Path(outDirectory).exists()):
-        make_dir(outDirectory)
-    all_commit_info = get_all_commit_info(repDirectory)
-    repo = pygit2.Repository(repDirectory)
-    source_dir_name = "source_file"
-    make_dir(os.path.join(outDirectory, source_dir_name))
-    for commit_info in all_commit_info:
-        repo.checkout_tree(repo.get(commit_info.hex))
-        fileList = list(Path(repDirectory).glob('**/*.c'))
-        for src in fileList:
-            destFilenName = os.path.join(outDirectory, source_dir_name, commit_info.date+'_'+commit_info.hex+'.c')
-            shutil.copy(src,destFilenName)
-        repo.reset(all_commit_info[0].hex,pygit2.GIT_RESET_HARD)
-    return True
 
 def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
     """ Copy all commited file '.c' contained in repDirectory into outDirectory
         repDirectory could be a bare repository
         Return True if the copy succeed"""
+
+
     if pygit2.discover_repository(repDirectory) is None:
-         return False
+        return False
+    source_dir_name = "source_file"
+    basename = Path(repDirectory).name
+    outdir = os.path.join(outDirectory, basename, source_dir_name)
+    if (not Path(outdir).exists()):
+        make_dir(outdir)
     repo = pygit2.Repository(repDirectory)
     with tempfile.TemporaryDirectory() as tmpdirname:
-        repo_not_bare = pygit2.clone_repository(repo.path,tmpdirname)
-        return copy_all_committed_file_not_bare(tmpdirname, outDirectory)
+        clonedRepo = pygit2.clone_repository(repDirectory, tmpdirname)
+        all_commit_info = get_all_commit_info(tmpdirname)
+        for commit_info in all_commit_info:
+            clonedRepo.checkout_tree(clonedRepo.get(commit_info.hex))
+            fileList = list(Path(tmpdirname).glob('*.c'))
+            for src in fileList:
+                committedFileName = Path(src).name
+                destFilenName = os.path.join(outdir, commit_info.date+'_'+commit_info.hex+'_'+committedFileName)
+                shutil.copy(src, destFilenName)
+            clonedRepo.reset(all_commit_info[0].hex, pygit2.GIT_RESET_HARD)
+
+    return True
 
 def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='analyzerOutput'):
     """
@@ -130,8 +127,8 @@ def main():
     args = parser.parse_args()
     workdir = args.workdir
     outdir = args.outputdir
-    copy_all_commit_from_all_repository(workdir, outdir)
-    compile_all_file(outdir)
+    copy_all_committed_file(workdir, outdir)
+    # compile_all_file(outdir)
 
 if __name__ == '__main__':
     main()
