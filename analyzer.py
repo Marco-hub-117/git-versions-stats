@@ -23,6 +23,14 @@ def init_argparser():
                         help='Directory containing the git repositories. Default = "%(default)s"')
     parser.add_argument('--outputdir', '-o', metavar='outdir', default = './analyzerOutput',
                             help='Directory containing the output. Default = "%(default)s"')
+
+    helpFileSearchedArgument = """File searched for the copy,
+    it's possible to pass argument following unix shell rules (for example *.py).
+    You need to pass the arguments between quotes, for example -fs '*.c' '*.py'.
+    Default = "%(default)s" """
+    parser.add_argument('--fileSearched', '-fs',
+                        default = ['*.c'], nargs = '*',
+                        help= helpFileSearchedArgument)
     return parser
 
 def make_dir(dirName):
@@ -49,7 +57,7 @@ def get_all_commit_info(repDirectory):
 
 def find_necessary_file(path, fileSearchedList):
     """
-        Find all file that match an element of the list passed, contained into path passed
+        Find all file, contained into path passed, that match an element of the list passed
     """
     necessaryFile = []
     for fileSearched in fileSearchedList:
@@ -153,7 +161,11 @@ def main():
     args = parser.parse_args()
     workdir = args.workdir
     outdir = args.outputdir
-    copy_all_committed_file(workdir, outdir)
+    fileSearchedList = args.fileSearched
+    print('WORKDIR:', workdir)
+    print('OUTDIR:', outdir)
+    print('FILESEARCHEDLIST', fileSearchedList)
+    copy_all_committed_file(workdir, outdir, fileSearchedList)
     # compile_all_file(outdir)
 
 if __name__ == '__main__':
