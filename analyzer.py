@@ -47,14 +47,34 @@ def get_all_commit_info(repDirectory):
 
     return commit_info_list
 
+def find_necessary_file(path, fileSearchedList):
+    """
+        Find all file that match an element of the list passed, contained into path passed
+    """
+    necessaryFile = []
+    for fileSearched in fileSearchedList:
+        for fileFound in Path(path).rglob(fileSearched):
+            if '.git' in Path(fileFound).parts:
+                continue
+            if '.config' in Path(fileFound).parts:
+                continue
+            necessaryFile.append(fileFound)
 
-def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
-    """ Copy all commited file '.c' contained in repDirectory into outDirectory
-        repDirectory could be a bare repository
-        Return True if the copy succeed"""
+    return necessaryFile
 
+def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', fileSearchedList = ['*.c']):
+    """ Copy all commited file that match an element of fileSearchedList
+        contained in repDirectory into outDirectory.
+        fileSearchedList could contain all the pathnames matching a specified
+        pattern according to the rules used by the Unix shell.
+        By default fileSerchedList contain only '*.c', so the function
+        will copy all .c file commited into repDirectoy.
+        repDirectory could be a bare repository.
+        Return True if the copy succeed
+    """
 
     if pygit2.discover_repository(repDirectory) is None:
+        print(f'{repDirectoy} is not a repository')
         return False
     source_dir_name = "source_file"
     basename = Path(repDirectory).name
@@ -64,15 +84,21 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput'):
     repo = pygit2.Repository(repDirectory)
     with tempfile.TemporaryDirectory() as tmpdirname:
         clonedRepo = pygit2.clone_repository(repDirectory, tmpdirname)
+        last = clonedRepo[repo.head.target]
         all_commit_info = get_all_commit_info(tmpdirname)
         for commit_info in all_commit_info:
             clonedRepo.checkout_tree(clonedRepo.get(commit_info.hex))
-            fileList = list(Path(tmpdirname).glob('*.c'))
-            for src in fileList:
+
+            necessaryFile = find_necessary_file(tmpdirname, fileSearchedList)
+            print('NECESSARY:', necessaryFile)
+            print('####################')
+
+            for src in necessaryFile:
                 committedFileName = Path(src).name
                 destFilenName = os.path.join(outdir, commit_info.date+'_'+commit_info.hex+'_'+committedFileName)
                 shutil.copy(src, destFilenName)
-            clonedRepo.reset(all_commit_info[0].hex, pygit2.GIT_RESET_HARD)
+
+            clonedRepo.reset(last.id, pygit2.GIT_RESET_HARD)
 
     return True
 
