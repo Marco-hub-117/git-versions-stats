@@ -32,13 +32,13 @@ def get_date_lists(csvFileToRead):
                 secondDateList.append(row[3])
 
         firstDateList.sort(reverse = True)
-        secondDateList.sort(reverse = True)
+        secondDateList.sort()
 
         return firstDateList, secondDateList
 
 def get_sim_matrices(csvFileToRead):
     """ Return tree matrices containing the similiraity percentage result
-        retireved from the csv file passed.
+        retrieved from the csv file passed.
         The first matrix contain the mean between the two percentage
         the second contain the similarity percentage of the first file
         compared to the second, while the third matrix contain the similarity
@@ -128,64 +128,6 @@ def heatmap(data, row_labels, col_labels, ax=None,
 
     return im, cbar
 
-def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
-                     textcolors=("black", "white"),
-                     threshold=None, **textkw):
-    """
-    A function to annotate a heatmap.
-
-    Parameters
-    ----------
-    im
-        The AxesImage to be labeled.
-    data
-        Data used to annotate.  If None, the image's data is used.  Optional.
-    valfmt
-        The format of the annotations inside the heatmap.  This should either
-        use the string format method, e.g. "$ {x:.2f}", or be a
-        `matplotlib.ticker.Formatter`.  Optional.
-    textcolors
-        A pair of colors.  The first is used for values below a threshold,
-        the second for those above.  Optional.
-    threshold
-        Value in data units according to which the colors from textcolors are
-        applied.  If None (the default) uses the middle of the colormap as
-        separation.  Optional.
-    **kwargs
-        All other arguments are forwarded to each call to `text` used to create
-        the text labels.
-    """
-
-    if not isinstance(data, (list, np.ndarray)):
-        data = im.get_array()
-
-    # Normalize the threshold to the images color range.
-    if threshold is not None:
-        threshold = im.norm(threshold)
-    else:
-        threshold = im.norm(data.max())/2.
-
-    # Set default alignment to center, but allow it to be
-    # overwritten by textkw.
-    kw = dict(horizontalalignment="center",
-              verticalalignment="center")
-    kw.update(textkw)
-
-    # Get the formatter in case a string is supplied
-    if isinstance(valfmt, str):
-        valfmt = mpl.ticker.StrMethodFormatter(valfmt)
-
-    # Loop over the data and create a `Text` for each "pixel".
-    # Change the text's color depending on the data.
-    texts = []
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
-            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
-            texts.append(text)
-
-    return texts
-
 
 def main():
     parser = init_argparser()
@@ -207,8 +149,8 @@ def main():
     cbar_kw = { 'ticks': [x for x in range(0,110,10)], 'drawedges': True }
 
     im, cbar = heatmap(percSimMatrix[0], firstDateList, secondDateList, ax=ax,
-                       cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage similarity [%]")
-    # texts = annotate_heatmap(im, valfmt="{x:.1f}", size = 6.0, threshold = 60.0)
+                       cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage of similarity [%]")
+
     font = {'weight': 'semibold',
             'size': '24.0'
             }
@@ -219,9 +161,6 @@ def main():
     ax.set_xlabel(csvFileName.split('_')[1], color = 'mediumblue', fontsize = 20.0)
 
     plt.show()
-
-
-
 
 
 
