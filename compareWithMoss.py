@@ -88,7 +88,7 @@ def get_date_from_file_name(fileName):
     fileNameParts = fileName.split('_')
     return fileNameParts[0] + '_' + fileNameParts[1]
 
-def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup):
+def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup, necessaryComparison):
     """
         Return a nested list containing all valid information
         retieved from the moss web page.
@@ -120,11 +120,26 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup):
         file2 = value[1]
         lineMatch = value[2]
         if ((file1.split(' ')[0] in firstFileGroup) and (file2.split(' ')[0] in secondFileGroup)):
+            if ([file1.split(' ')[0], file2.split(' ')[0]] not in necessaryComparison):
+                continue
             print(file1, file2, lineMatch, sep = '|||')
             row = [file1.split(' ')[0], file2.split(' ')[0],
                 get_date_from_file_name(file1), get_date_from_file_name(file2),
                 url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
             valid_rows.append(row)
+            try:
+                necessaryComparison.remove([file1.split(' ')[0], file2.split(' ')[0]])
+            except ValueError as e:
+                print(e)
+
+    # if a comparsion between two file is not present in the moss result page
+    # then means that the two file doesn't match, so it need to be added
+    # into valid rows a 0% match
+    for elem in necessaryComparison:
+        row = [elem[0], elem[1],
+            get_date_from_file_name(elem[0]), get_date_from_file_name(elem[1]),
+            url, 0.0, 0.0, 0]
+        valid_rows.append(row)
 
     return valid_rows
 
@@ -153,6 +168,39 @@ def get_N_elements_from_list(list, N = 50, sort = False):
 
     return resultList
 
+def get_all_possible_comparison(firstFileList, secondFileList):
+
+    resultList = []
+    for firstFile in firstFileList:
+        for secondFile in secondFileList:
+            couple = [firstFile, secondFile]
+            resultList.append(couple)
+
+    return resultList
+
+def retrieve_completed_comparison(csvFileName):
+
+    with open(csvFileName, 'r', newline = '') as csvfile:
+        reader = csv.reader(csvfile)
+        field = next(reader)
+        retrievedComparisonList = []
+        for row in reader:
+            couple = [row[0], row[1]]
+            retrievedComparisonList.append(couple)
+
+    return retrievedComparisonList
+
+def get_difference_between_list(firstList, secondList):
+    """ Return a list containing all element of first list that are not present
+    in second list
+    """
+
+    differenceList = []
+    for elem in firstList:
+        if elem not in secondList:
+            differenceList.append(elem)
+
+    return differenceList
 
 def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_compare'):
     """
@@ -176,21 +224,33 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    N = 160
+    N = 100
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
     secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
+
+    allComparisonsList = get_all_possible_comparison(firstFileList, secondFileList)
+    print(len(allComparisonsList))
+
+    retrievedComparisonList = retrieve_completed_comparison(csvFilePath)
+    print(len(retrievedComparisonList))
+
+    # allMissingComparison = get_difference_between_list(allComparisonsList, retrievedComparisonList)
+    # print(len(allMissingComparison))
 
     n = 16 # number of element in each group
     for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
         for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
-            # url = init_moss_and_send(firstFileGroup, secondFileGroup)
-            # print()
-            # print(url)
-            # if (url is None):
-            #     continue
+            groupComparison = get_all_possible_comparison(firstFileGroup, secondFileGroup)
+            missingComparison = get_difference_between_list(groupComparison, retrievedComparisonList)
+            firstFileGroupMissing = list(set([elem[0] for elem in missingComparison]))
+            secondFileGroupMissing = list(set([elem[1] for elem in missingComparison]))
+            print('firstFileGroupMissing NUMBER', len(firstFileGroupMissing))
+            print('secondFileGroupMissing NUMBER', len(secondFileGroupMissing))
+            if ((len(firstFileGroupMissing) <= 0) or (len(secondFileGroupMissing) <= 0)):
+                continue
             retries = 2
             while True:
-                mossThread = MossHandlingThread(firstFileGroup, secondFileGroup)
+                mossThread = MossHandlingThread(firstFileGroupMissing, secondFileGroupMissing)
                 mossThread.start()
                 mossThread.join(300.0)
                 print(mossThread.result_url)
@@ -207,8 +267,37 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
             if mossThread.result_url == None:
                 print(f"ERRORE, gruppo {firstFileGroup[0]}__{secondFileGroup[0]}")
                 continue
-            rows = get_valid_rows_from_url(mossThread.result_url, firstFileGroup, secondFileGroup)
+            rows = get_valid_rows_from_url(mossThread.result_url,
+                    firstFileGroupMissing, secondFileGroupMissing, missingComparison)
             add_rows_to_csv(csvFilePath, rows)
+
+
+
+
+    # n = 16 # number of element in each group
+    # for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
+    #     for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
+    #         retries = 2
+    #         while True:
+    #             mossThread = MossHandlingThread(firstFileGroup, secondFileGroup)
+    #             mossThread.start()
+    #             mossThread.join(300.0)
+    #             print(mossThread.result_url)
+    #             print()
+    #             if mossThread.result_url == None:
+    #                 retries -= 1
+    #                 if (retries > 0):
+    #                     continue
+    #                 else:
+    #                     break
+    #             else:
+    #                 break
+    #
+    #         if mossThread.result_url == None:
+    #             print(f"ERRORE, gruppo {firstFileGroup[0]}__{secondFileGroup[0]}")
+    #             continue
+    #         rows = get_valid_rows_from_url(mossThread.result_url, firstFileGroup, secondFileGroup)
+    #         add_rows_to_csv(csvFilePath, rows)
 
 
 def main():
@@ -219,6 +308,8 @@ def main():
     outdir = args.outdir
 
     compare_with_moss_all_file(firstDir, secondDir, outdir)
+    print("ALL COMPARISON COMPLETED")
+    quit()
 
 
 if __name__ == '__main__':
