@@ -15,9 +15,9 @@ The following command show the help message
 
 - The option `--workdir workdir` is used to specify the path containining the repository from wich to extract all commited file searched. (default is ".")
 
-- The option `--outputdir outdir` is used to specify the path that will contain the extracted source code (deafult is "./analyzerOutput"). The Source code name has the following format: `date-string_commit-hex_original-sorce-code-name`
+- The option `--outputdir outdir` is used to specify the path that will contain the extracted source code (deafult is "./analyzerOutput"). The extracted source code name has the following format: `date-string_commit-hex_original-sorce-code-name`
 
-- The option `[--fileSearched [FILESEARCHED ...]]` is used to specify the name of the file you need to extract from the repository. By default is "*.c", so the script will extract all *.c source code committed. The arguments must be enclosed into quotes .You can specify more than one file name, for example `anlyzer.py --fileSearched '*.c' '*.py' 'file-testo.txt'` will search all committed file, that match one of the fileSerached argument, extracted from the git repository contained into '.' path, and will save them into ./analyzerOutput directory. In this example the script will extract all commited file that end with _.c_ and _.py_, and all committed files with name _file-testo.txt_
+- The option `[--fileSearched [FILESEARCHED ...]]` is used to specify the name of the file you need to extract from the repository. By default is "*.c", so the script will extract all *.c source code committed. The arguments must be enclosed into quotes .You can specify more than one file name, for example `analyzer.py --fileSearched '*.c' '*.py' 'file-testo.txt'` will search all committed file, that match one of the fileSerached argument, extracted from the git repository contained into '.' path, and will save them into ./analyzerOutput directory. In this example the script will extract all commited file that end with _.c_ and _.py_, and all committed files with the exact following name _file-testo.txt_
 
 
 
