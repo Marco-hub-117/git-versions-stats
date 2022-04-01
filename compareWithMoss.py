@@ -9,6 +9,7 @@ import re
 import time
 import subprocess
 from supportModules.sendMossRequest import MossHandlingThread
+from supportModules.csvSupport import init_csv_file, add_rows_to_csv
 
 userid = 719337169
 
@@ -29,41 +30,6 @@ def make_dir(dirName):
     except FileExistsError:
         print(f'la cartella {dirName} è già presente')
 
-def init_csv_file(destDirectory, fileName, field):
-    """
-        Init a .csv file with the first row containing field passed.
-        field must be a list.
-        return the destination file path
-    """
-    make_dir(destDirectory)
-    if not Path(fileName).suffix == ".csv":
-        fileName += '.csv'
-
-    destFile = os.path.join(destDirectory,fileName)
-
-    if os.path.isfile(destFile):
-        overwrite = input(f'Do you want to overwrite the file {destFile}? \n(ok, y, yes) per confermare\n')
-        if overwrite in ['ok', 'y', 'yes']:
-            with open(destFile, 'w', newline = '') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(field)
-            print(f'File {destFile} overwritten')
-    else:
-        print(f'init a new csv file: {destFile}')
-        with open(destFile, 'w', newline = '') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(field)
-
-    return destFile
-
-def add_rows_to_csv(csvFileName, rows):
-    """
-        append all rows passed into csvFileName
-    """
-    with open(csvFileName, 'a', newline = '') as csvfile:
-        writer = csv.writer(csvfile)
-        for row in rows:
-            writer.writerow(row)
 
 def get_perc_from_value(value):
     """
@@ -224,7 +190,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
-    N = 100
+    N = 160
     firstFileList = get_N_elements_from_list(firstAllFileList, N, sort = True)
     secondFileList = get_N_elements_from_list(secondAllFileList, N, sort = True)
 
@@ -273,33 +239,6 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
 
 
 
-
-    # n = 16 # number of element in each group
-    # for firstFileGroup in [firstFileList[i:i+n] for i in range(0, len(firstFileList), n)]:
-    #     for secondFileGroup in [secondFileList[i:i+n] for i in range(0, len(secondFileList), n)]:
-    #         retries = 2
-    #         while True:
-    #             mossThread = MossHandlingThread(firstFileGroup, secondFileGroup)
-    #             mossThread.start()
-    #             mossThread.join(300.0)
-    #             print(mossThread.result_url)
-    #             print()
-    #             if mossThread.result_url == None:
-    #                 retries -= 1
-    #                 if (retries > 0):
-    #                     continue
-    #                 else:
-    #                     break
-    #             else:
-    #                 break
-    #
-    #         if mossThread.result_url == None:
-    #             print(f"ERRORE, gruppo {firstFileGroup[0]}__{secondFileGroup[0]}")
-    #             continue
-    #         rows = get_valid_rows_from_url(mossThread.result_url, firstFileGroup, secondFileGroup)
-    #         add_rows_to_csv(csvFilePath, rows)
-
-
 def main():
     parser = init_argparser()
     args = parser.parse_args()
@@ -307,8 +246,14 @@ def main():
     secondDir = args.seconddir
     outdir = args.outdir
 
-    compare_with_moss_all_file(firstDir, secondDir, outdir)
-    print("ALL COMPARISON COMPLETED")
+    if (not Path(firstDir).is_dir()):
+        print(f"Attention, {firstDir} doesn't exist")
+    elif (not Path(secondDir).is_dir()):
+        print(f"Attention, {secondDir} doesn't exist")
+    else :
+        compare_with_moss_all_file(firstDir, secondDir, outdir)
+        print("ALL COMPARISON COMPLETED")
+
     quit()
 
 
