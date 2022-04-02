@@ -46,7 +46,7 @@ def build_parser():
         '../build/my-languages.so',
 
         [
-            './tree-sitter-c'
+            './supportModules/compareCode/tree-sitter-c'
         ]
     )
 

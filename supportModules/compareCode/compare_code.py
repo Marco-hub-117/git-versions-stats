@@ -1,4 +1,4 @@
-from code_tokenizer import tokenize
+from supportModules.compareCode.code_tokenizer import tokenize
 
 import ntpath
 import subprocess
