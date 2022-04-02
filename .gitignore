@@ -4,4 +4,5 @@ ab0343
 ab0383
 ab0343-lim-50
 ab0383-lim-50
-supportModules/__pycache__
+supportModules/**/__pycache__
+internal_compare_result/reformat_code
