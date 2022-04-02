@@ -1,5 +1,6 @@
 import csv
 import argparse
+import os
 from datetime import datetime
 import numpy as np
 import matplotlib as mpl
@@ -11,7 +12,18 @@ def init_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--filetoread', '-f', metavar='filetoread', default = './file.csv',
                         help='csv file to read. Default = "%(default)s"')
+
+    parser.add_argument('--saveimage', '-s', metavar='PATH-TO-SAVE-TO', default = None,
+                        help='specify the path in wich save the result heatmap. If not specified, the script doesn\'t save the image ')
+
     return parser
+
+def make_dir(dirName):
+    try:
+        os.makedirs(dirName)
+    except FileExistsError:
+        print(f'la cartella {dirName} è già presente')
+
 
 def get_date_lists(csvFileToRead):
     """
@@ -133,6 +145,7 @@ def main():
     parser = init_argparser()
     args = parser.parse_args()
     destFile = args.filetoread
+    pathToSaveImage = args.saveimage
 
     csvFileName = (Path(destFile).name).split('.')[0]
 
@@ -152,13 +165,20 @@ def main():
                        cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage of similarity [%]")
 
     font = {'weight': 'semibold',
-            'size': '24.0'
+            'size': '28.0'
             }
     title = fig.suptitle(csvFileName+' - MEAN', verticalalignment = "center", fontproperties = font )
     title.set(color = 'darkred')
 
-    ax.set_ylabel(csvFileName.split('_')[0], color = 'mediumblue', fontsize = 20.0)
-    ax.set_xlabel(csvFileName.split('_')[1], color = 'mediumblue', fontsize = 20.0)
+    ax.set_ylabel(csvFileName.split('_')[0], color = 'mediumblue', fontsize = 24.0)
+    ax.set_xlabel(csvFileName.split('_')[1], color = 'mediumblue', fontsize = 24.0)
+
+    fig.set_size_inches(24, 18)
+
+    if (pathToSaveImage is not None):
+        print(f'Saving image into {pathToSaveImage}')
+        make_dir(pathToSaveImage)
+        plt.savefig(os.path.join(pathToSaveImage, csvFileName))
 
     plt.show()
 
