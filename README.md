@@ -7,17 +7,38 @@ This repository contain three different script:
 # analyzer.py
 Here a list of possible command and option for analyzer.py
 
+The following command show the **help** message: `python3 analyzer.py --help`
+
 **usage**: analyzer.py [-h] [--workdir workdir] [--outputdir outdir] [--fileSearched [FILESEARCHED ...]]
 
-The following command show the help message
+- The option `--workdir workdir` ( -d is the short version of the command ) is used to specify the path containining the repository from wich to extract all commited file searched. (default is ".")
 
-`python3 analyzer.py --help`
+- The option `--outputdir outdir` ( -o is the short version of the command ) is used to specify the path that will contain the extracted source code (deafult is "./analyzerOutput"). The extracted source code name has the following format: `date-string_commit-hex_original-source-code-name`
 
-- The option `--workdir workdir` is used to specify the path containining the repository from wich to extract all commited file searched. (default is ".")
+- The option `[--fileSearched [FILESEARCHED ...]]` ( -fs is the short version of the command ) is used to specify the name of the file you need to extract from the repository. By default is "*.c", so the script will extract all *.c source code committed. The arguments must be enclosed into quotes .You can specify more than one file name, for example `analyzer.py --fileSearched '*.c' '*.py' 'file-testo.txt'` will search all committed file, that match one of the fileSearched argument, extracted from the git repository contained into '.' path, and will save them into ./analyzerOutput directory. In this example the script will extract all commited file that end with _.c_ and _.py_, and all committed files with the exact _file-testo.txt_ name
 
-- The option `--outputdir outdir` is used to specify the path that will contain the extracted source code (deafult is "./analyzerOutput"). The extracted source code name has the following format: `date-string_commit-hex_original-source-code-name`
+The following is a **summary example** for analyzer.py:
 
-- The option `[--fileSearched [FILESEARCHED ...]]` is used to specify the name of the file you need to extract from the repository. By default is "*.c", so the script will extract all *.c source code committed. The arguments must be enclosed into quotes .You can specify more than one file name, for example `analyzer.py --fileSearched '*.c' '*.py' 'file-testo.txt'` will search all committed file, that match one of the fileSearched argument, extracted from the git repository contained into '.' path, and will save them into ./analyzerOutput directory. In this example the script will extract all commited file that end with _.c_ and _.py_, and all committed files with the exact following name _file-testo.txt_
+`python3 analyzer.py -d path-to-git-rep -o example-analyzer-output -fs '*.py'`
+
+The following command will extract all the *.py command commited into path-to-git-rep repository and will save them into example-analyzer-output directory 
+
+
+# compareWithMoss.py
+Here a list of possible command and option for compareWithMoss.py
+
+The script compare all .c source code contained into first directory passed with all the .c source code contained into second directory passed, sending moss request and retrieving the result from the resulting moss web page. 
+
+It will save the result into a csv file with the following field: 
+
+['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
+
+
+The following command show the **help** message: `python3 compareWithMoss.py --help`
+
+**usage**: compareWithMoss.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outdir outdir]
+
+- The option `--firstdir firstdir` is used to specify the first directory to 
 
 
 
