@@ -15,6 +15,8 @@ def init_argparser():
 
     parser.add_argument('--saveimage', '-s', metavar='PATH-TO-SAVE-TO', default = None,
                         help='specify the path in wich save the result heatmap. If not specified, the script doesn\'t save the image ')
+    parser.add_argument('--imageformat', '-format', metavar='IMAGE FORMAT', default = 'png', choices = ['png', 'svg', 'pdf'],
+                        help='specify the format of the saved image. Choices are %(choices)s. Default = "%(default)s" ')
 
     return parser
 
@@ -146,6 +148,7 @@ def main():
     args = parser.parse_args()
     destFile = args.filetoread
     pathToSaveImage = args.saveimage
+    imageFormat = args.imageformat
 
     csvFileName = (Path(destFile).name).split('.')[0]
 
@@ -178,7 +181,8 @@ def main():
     if (pathToSaveImage is not None):
         print(f'Saving image into {pathToSaveImage}')
         make_dir(pathToSaveImage)
-        plt.savefig(os.path.join(pathToSaveImage, csvFileName), dpi = 300.0)
+        plt.savefig(os.path.join(pathToSaveImage, csvFileName+'.'+imageFormat),
+                format = imageFormat, dpi = 300.0)
 
     plt.show()
 
