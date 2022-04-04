@@ -87,11 +87,11 @@ You may need to run `sudo apt-get install python3-tk` to show the pyplot figure 
 
 The following command show the **help** message: `python3 heatMapGenerator.py --help`
 
-- the option `--filetoread filetoread` is used to specifiy the csv file you want to read to plot the heatmap
+- the option `--filetoread filetoread` is used to specifiy the **csv file** you want to **read** to plot the heatmap
 
-- the option `--saveimage PATH-TO-SAVE-TO` is used specify the path in wich save the result heatmap. If not specified, the script doesn't save the image
+- the option `--saveimage PATH-TO-SAVE-TO` is used specify the **path** in wich **save** the result heatmap. If not specified, the script doesn't save the image
 
-- the option `--imageformat IMAGE FORMAT` specify the format of the saved image. Choices are png, svg, pdf. Default = "png"
+- the option `--imageformat IMAGE FORMAT` specify the format of the saved image. Choices are **png, svg, pdf**. Default = "png"
 
 [Here](https://gitlab-rbl.unipv.it/source-code-analysis/git-versions-stats/-/tree/main/heatMapSavedImage/lim-160) you can find some example of resulting image.
 
