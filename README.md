@@ -73,5 +73,25 @@ When the script start it search into output directory if a csv file with the sam
 
 
 #  heatMapGenerator.py
+<details><summary>heatMapGenerator.py used to visualize the csv file generated from the compareWithMoss.py script into a heatmap (Click to expand)</summary>
 
-You may need to run `sudo apt-get install python3-tk` to show the pyplot figure gui
+---------------------------------------------------------------------------------------------------------------------------------------
+
+You need to install [matplotlib](https://matplotlib.org/stable/users/getting_started/index.html#installation-quick-start) and  [numpy](https://numpy.org/install/) packages.
+
+You can simply run `pip install matplotlib` and `pip install numpy` to do it.
+
+You may need to run `sudo apt-get install python3-tk` to show the pyplot figure gui.
+
+**usage**: `heatMapGenerator.py [-h] [--filetoread filetoread] [--saveimage PATH-TO-SAVE-TO]`
+
+The following command show the **help** message: `python3 heatMapGenerator.py --help`
+
+- the option `--filetoread filetoread` is used to specifiy the csv file you want to read to plot the heatmap
+
+- the option `--saveimage PATH-TO-SAVE-TO` is used specify the path in wich save the result heatmap. If not specified, the script doesn't save the image
+
+[Here](https://gitlab-rbl.unipv.it/source-code-analysis/git-versions-stats/-/tree/main/heatMapSavedImage/lim-160) you can find some example of resulting image.
+
+</details>
+
