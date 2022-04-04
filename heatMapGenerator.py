@@ -178,7 +178,7 @@ def main():
     if (pathToSaveImage is not None):
         print(f'Saving image into {pathToSaveImage}')
         make_dir(pathToSaveImage)
-        plt.savefig(os.path.join(pathToSaveImage, csvFileName))
+        plt.savefig(os.path.join(pathToSaveImage, csvFileName), dpi = 300.0)
 
     plt.show()
 
