@@ -80,6 +80,8 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', file
         repDirectory could be a bare repository.
         Return True if the copy succeed
     """
+    if (repDirectory == '.'):
+        repDirectory = os.getcwd()
 
     if pygit2.discover_repository(repDirectory) is None:
         print(f'{repDirectoy} is not a repository')
