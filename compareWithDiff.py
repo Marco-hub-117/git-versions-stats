@@ -14,7 +14,7 @@ def init_argparser():
                         help='First directory containing .c file to compare. Default = "%(default)s"')
     parser.add_argument('--seconddir', '-s', metavar='seconddir', default = './second',
                         help='second directory containing .c file to compare. Default = "%(default)s"')
-    parser.add_argument('--outdir', '-o', metavar='outdir', default = './internal_compare_result',
+    parser.add_argument('--outdir', '-o', metavar='outdir', default = './diff_compare_result',
                             help='Output directory containing the csv file with compare results. Default = "%(default)s"')
     return parser
 
@@ -37,14 +37,48 @@ def get_date_from_file_name(fileName):
     return fileNameParts[0] + '_' + fileNameParts[1]
 
 
-def compare_with_internal_all_file(firstDir, secondDir, resultDir = './internal_compare_result'):
+def find_max(rows):
+    """
+        Return the max of the 'SUM_TOKENS' field.
+        each row has the following field format:
+        ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
+            'ADD_TOKENS', 'REMOVE_TOKENS', 'SUM_TOKENS']
+    """
+
+    max = 0
+    for row in rows:
+        if (row[6] > max):
+            max = row [6]
+
+    return max
+
+
+def complete_rows_with_missing_field(partialRows):
+    """
+        This function complete each row with the missing information required
+    """
+
+    max = find_max(partialRows)
+    print(max)
+    rows = [] # this list will contain all completed row
+    for partialRow in partialRows:
+        diffWithMax = max - partialRow[6]
+        similarityPerc = (diffWithMax / max) * 100
+        partialRow.append(diffWithMax)
+        partialRow.append(similarityPerc) # now partial row has all missing field
+        rows.append(partialRow)
+
+    return rows
+
+
+def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_result'):
     """
         create a csv file into resultDir containing information retrieved
         from internal comparison. It will contain information between the comparison
         of all .c file contained into firstDir and secondDir.
         The csv file has the following field:
         ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
-            'ADD_TOKENS', 'REMOVE_TOKENS']
+            'ADD_TOKENS', 'REMOVE_TOKENS', 'SUM_TOKENS', 'DIFF_WITH_MAX', 'SIMILARITY [%]']
     """
     # init all variable needed
     firstAllFileList = glob.glob(os.path.join(firstDir,'**/*.c'), recursive = True)
@@ -54,21 +88,24 @@ def compare_with_internal_all_file(firstDir, secondDir, resultDir = './internal_
     # init result dir and csv file
     make_dir(resultDir)
     field = ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
-        'ADD_TOKENS', 'REMOVE_TOKENS']
+        'ADD_TOKENS', 'REMOVE_TOKENS', 'SUM_TOKENS', 'DIFF_WITH_MAX', 'SIMILARITY [%]']
     csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}.csv'
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
     reformatCodePath = os.path.join(resultDir, 'reformat_code')
     make_dir(reformatCodePath)
-    rows = []
+
+    partialRows = []
     for firstFile in firstAllFileList:
         for secondFile in secondAllFileList:
             addToken, remToken = compare_code(firstFile, secondFile, reformatCodePath)
-            row = [firstFile, secondFile, get_date_from_file_name(firstFile),
-                get_date_from_file_name(secondFile), addToken, remToken]
-            print(row)
-            rows.append(row)
+            partialRow = [firstFile, secondFile, get_date_from_file_name(firstFile),
+                get_date_from_file_name(secondFile), addToken, remToken, addToken+remToken]
+            print(partialRow)
+            partialRows.append(partialRow)
+
+    rows = complete_rows_with_missing_field(partialRows)
 
     add_rows_to_csv(csvFilePath, rows)
 
@@ -86,7 +123,7 @@ def main():
     elif (not Path(secondDir).is_dir()):
         print(f"Attention, {secondDir} doesn't exist")
     else :
-        compare_with_internal_all_file(firstDir, secondDir, outdir)
+        compare_with_diff_all_file(firstDir, secondDir, outdir)
         print("ALL COMPARISON COMPLETED")
 
     quit()
