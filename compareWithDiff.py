@@ -6,6 +6,17 @@ import argparse
 from supportModules.csvSupport import init_csv_file, add_rows_to_csv
 from supportModules.compareCode.compare_code import compare_code
 
+# The following are the resulting csv fields with their indexes
+FILE_NAME_1 = 0
+FILE_NAME_2 = 1
+TIME_STAMP_1 = 2
+TIME_STAMP_2 = 3
+ADD_TOKENS = 4
+REMOVE_TOKENS = 5
+SUM_TOKENS = 6
+DIFF_WITH_MAX = 7
+SIMILARITY = 8
+
 
 def init_argparser():
     """Initialize the command line parser."""
@@ -47,8 +58,8 @@ def find_max(rows):
 
     max = 0
     for row in rows:
-        if (row[6] > max):
-            max = row [6]
+        if (row[SUM_TOKENS] > max):
+            max = row [SUM_TOKENS] # SUM_TOKENS is a constant defined at the beginning of the script
 
     return max
 
@@ -62,7 +73,7 @@ def complete_rows_with_missing_field(partialRows):
     print(max)
     rows = [] # this list will contain all completed row
     for partialRow in partialRows:
-        diffWithMax = max - partialRow[6]
+        diffWithMax = max - partialRow[SUM_TOKENS] # SUM_TOKENS is a constant defined at the beginning of the script
         similarityPerc = (diffWithMax / max) * 100
         partialRow.append(diffWithMax)
         partialRow.append(similarityPerc) # now partial row has all missing field
