@@ -27,11 +27,46 @@ def make_dir(dirName):
         print(f'la cartella {dirName} è già presente')
 
 
+def get_time_stamp_indexes(csvFileToRead):
+    """
+        this function return the two indexes of 'TIME_STAMP_1' and 'TIME_STAMP_2'
+        based on the field of the csvfile passed.
+        return None if not found
+    """
+    with open(csvFileToRead, newline = '') as csvfile:
+        reader = csv.reader(csvfile)
+        field = next(reader)
+        try:
+            return field.index('TIME_STAMP_1'), field.index('TIME_STAMP_2')
+        except ValueError as e:
+            print('TIME_STAMP_1 and TIME_STAMP_1 not found')
+            return None
+
+
+def get_similarity_index(csvFileToRead):
+    """
+        this function return the 'SIMILARITY [%]' index
+        based on the field of the csvfile passed.
+        return None if not found
+    """
+    with open(csvFileToRead, newline = '') as csvfile:
+        reader = csv.reader(csvfile)
+        field = next(reader)
+        try:
+            return field.index('SIMILARITY [%]')
+        except ValueError as e:
+            print('TIME_STAMP_1 and TIME_STAMP_1 not found')
+            return None
+
+
 def get_date_lists(csvFileToRead):
     """
         Return two sorted date list containing all date contained in the two
         columns of csvFileToRead that contain the timestamp
     """
+
+    timeStampIndex1, timeStampIndex2 = get_time_stamp_indexes(csvFileToRead)
+
     with open(csvFileToRead, newline = '') as csvfile:
         reader = csv.reader(csvfile)
         firstDateList = []
@@ -40,17 +75,17 @@ def get_date_lists(csvFileToRead):
 
         for row in reader:
 
-            if (not row[2] in firstDateList):
-                firstDateList.append(row[2])
-            if (not row[3] in secondDateList):
-                secondDateList.append(row[3])
+            if (not row[timeStampIndex1] in firstDateList):
+                firstDateList.append(row[timeStampIndex1])
+            if (not row[timeStampIndex2] in secondDateList):
+                secondDateList.append(row[timeStampIndex2])
 
         firstDateList.sort(reverse = True)
         secondDateList.sort()
 
         return firstDateList, secondDateList
 
-def get_sim_matrices(csvFileToRead):
+def get_similarity_matrix(csvFileToRead):
     """ Return tree matrices containing the similiraity percentage result
         retrieved from the csv file passed.
         The first matrix contain the mean between the two percentage
@@ -60,30 +95,28 @@ def get_sim_matrices(csvFileToRead):
 
     """
 
-    firstDateList, secondDateList = get_date_lists(csvFileToRead)
-    simMeanMatrix = np.zeros((len(firstDateList), len(secondDateList)))
-    simOneMatrix = np.zeros((len(firstDateList), len(secondDateList)))
-    simTwoMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+    timeStampIndex1, timeStampIndex2 = get_time_stamp_indexes(csvFileToRead)
+    similarityIndex = get_similarity_index(csvFileToRead)
 
-    print(simMeanMatrix.shape)
+    firstDateList, secondDateList = get_date_lists(csvFileToRead)
+    simMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+
+    print(simMatrix.shape)
 
     with open(csvFileToRead, newline = '') as csvfile:
         csvLineList = list(csv.reader(csvfile))
+        for row in csvLineList:
+            try:
+                xIndex = firstDateList.index(row[timeStampIndex1])
+                yIndex = secondDateList.index(row[timeStampIndex2])
+            except ValueError as e:
+                print(f'{row[timeStampIndex1]} and {row[timeStampIndex2]} not found')
+                continue
+            simMatrix[xIndex][yIndex] = float(row[similarityIndex])
 
-        for i in range (0, len(firstDateList)):
-            for j in range(0, len(secondDateList)):
-                for row in csvLineList:
-                    if (firstDateList[i] == row[2] and secondDateList[j] == row[3]):
-                        simMeanMatrix[i][j] = (float(row[5]) + float(row[6])) / 2
-                        simOneMatrix[i][j] = float(row[5])
-                        simTwoMatrix[i][j] = float(row[6])
-                        break
+    print(simMatrix)
 
-    print(simMeanMatrix)
-    print(simOneMatrix)
-    print(simTwoMatrix)
-
-    return simMeanMatrix, simOneMatrix, simTwoMatrix
+    return simMatrix
 
 
 def heatmap(data, row_labels, col_labels, ax=None,
@@ -121,8 +154,10 @@ def heatmap(data, row_labels, col_labels, ax=None,
     cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
 
     # Show all ticks and label them with the respective list entries.
-    ax.set_xticks(np.arange(data.shape[1]), labels=col_labels, fontsize = 'small')
-    ax.set_yticks(np.arange(data.shape[0]), labels=row_labels, fontsize = 'small')
+    # ax.set_xticks(np.arange(data.shape[1]), labels=col_labels, fontsize = 'small')
+    # ax.set_yticks(np.arange(data.shape[0]), labels=row_labels, fontsize = 'small')
+    ax.set_xticks([])
+    ax.set_yticks([])
 
     # Let the horizontal axes labeling appear on top.
     ax.tick_params(top=True, bottom=False,
@@ -154,7 +189,7 @@ def main():
 
     firstDateList, secondDateList = get_date_lists(destFile)
 
-    percSimMatrix = get_sim_matrices(destFile)
+    percSimMatrix = get_similarity_matrix(destFile)
 
     fig, ax = plt.subplots()
 
@@ -164,17 +199,17 @@ def main():
 
     cbar_kw = { 'ticks': [x for x in range(0,110,10)], 'drawedges': True }
 
-    im, cbar = heatmap(percSimMatrix[0], firstDateList, secondDateList, ax=ax,
+    im, cbar = heatmap(percSimMatrix, firstDateList, secondDateList, ax=ax,
                        cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage of similarity [%]")
 
     font = {'weight': 'semibold',
             'size': '28.0'
             }
-    title = fig.suptitle(csvFileName+' - MEAN', verticalalignment = "center", fontproperties = font )
+    title = fig.suptitle(csvFileName+' - SIMILARITY', verticalalignment = "center", fontproperties = font )
     title.set(color = 'darkred')
 
-    ax.set_ylabel(csvFileName.split('_')[0], color = 'mediumblue', fontsize = 24.0)
-    ax.set_xlabel(csvFileName.split('_')[1], color = 'mediumblue', fontsize = 24.0)
+    ax.set_ylabel(csvFileName.split('_')[0] + '- most recent top', color = 'mediumblue', fontsize = 24.0)
+    ax.set_xlabel(csvFileName.split('_')[1] + '- most recent right', color = 'mediumblue', fontsize = 24.0)
 
     fig.set_size_inches(24, 18)
 
