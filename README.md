@@ -52,7 +52,7 @@ The script compare all .c source code contained into first directory passed with
 
 It will save the result into a **csv file** with the following **field**: 
 
-- 'FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES'
+- 'FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'SIMILARITY [%]', 'LINES_MATCHES'
 
 The **resulting csv** has the following **name** format: _firstDirName_secondDirName.csv_
 
