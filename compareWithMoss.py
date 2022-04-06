@@ -89,9 +89,10 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup, necessaryCompa
             if ([file1.split(' ')[0], file2.split(' ')[0]] not in necessaryComparison):
                 continue
             print(file1, file2, lineMatch, sep = '|||')
+            similarity = (float(get_perc_from_value(file1)) + float(get_perc_from_value(file2)))/2
             row = [file1.split(' ')[0], file2.split(' ')[0],
                 get_date_from_file_name(file1), get_date_from_file_name(file2),
-                url, get_perc_from_value(file1), get_perc_from_value(file2), lineMatch]
+                url, get_perc_from_value(file1), get_perc_from_value(file2), similarity, lineMatch]
             valid_rows.append(row)
             try:
                 necessaryComparison.remove([file1.split(' ')[0], file2.split(' ')[0]])
@@ -104,7 +105,7 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup, necessaryCompa
     for elem in necessaryComparison:
         row = [elem[0], elem[1],
             get_date_from_file_name(elem[0]), get_date_from_file_name(elem[1]),
-            url, 0.0, 0.0, 0]
+            url, 0.0, 0.0, 0.0, 0]
         valid_rows.append(row)
 
     return valid_rows
@@ -175,7 +176,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
         of all .c file contained into firstDir and secondDir.
         The csv file has the following field:
         ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
-            'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
+            'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', SIMILARITY [%], 'LINES_MATCHES']
     """
     # init all variable needed
     firstAllFileList = glob.glob(os.path.join(firstDir,'**/*.c'), recursive = True)
@@ -185,7 +186,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     # init result dir and csv file
     make_dir(resultDir)
     field = ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
-        'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'LINES_MATCHES']
+        'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'SIMILARITY [%]', 'LINES_MATCHES']
     csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}.csv'
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
