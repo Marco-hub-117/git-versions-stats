@@ -55,7 +55,7 @@ def get_similarity_index(csvFileToRead):
         try:
             return field.index('SIMILARITY [%]')
         except ValueError as e:
-            print('TIME_STAMP_1 and TIME_STAMP_1 not found')
+            print('SIMILARITY [%] index not found')
             return None
 
 
@@ -97,6 +97,10 @@ def get_similarity_matrix(csvFileToRead):
 
     timeStampIndex1, timeStampIndex2 = get_time_stamp_indexes(csvFileToRead)
     similarityIndex = get_similarity_index(csvFileToRead)
+
+    if(timeStampIndex1 is None or timeStampIndex2 is None or similarityIndex is None):
+        print('File csv incopatible, must have the above index not found')
+        return None
 
     firstDateList, secondDateList = get_date_lists(csvFileToRead)
     simMatrix = np.zeros((len(firstDateList), len(secondDateList)))
@@ -190,6 +194,9 @@ def main():
     firstDateList, secondDateList = get_date_lists(destFile)
 
     percSimMatrix = get_similarity_matrix(destFile)
+
+    if(percSimMatrix is None):
+        quit()
 
     fig, ax = plt.subplots()
 
