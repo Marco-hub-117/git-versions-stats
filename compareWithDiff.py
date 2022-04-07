@@ -6,16 +6,16 @@ import argparse
 from supportModules.csvSupport import init_csv_file, add_rows_to_csv
 from supportModules.compareCode.compare_code import compare_code
 
-# The following are the resulting csv fields with their indexes
-FILE_NAME_1 = 0
-FILE_NAME_2 = 1
-TIME_STAMP_1 = 2
-TIME_STAMP_2 = 3
-ADD_TOKENS = 4
-REMOVE_TOKENS = 5
-SUM_TOKENS = 6
-DIFF_WITH_MAX = 7
-SIMILARITY = 8
+# The following are the csv fields with their indexes
+FILE_NAME_1_IND = 0
+FILE_NAME_2_IND = 1
+TIME_STAMP_1_IND = 2
+TIME_STAMP_2_IND = 3
+ADD_TOKENS_IND = 4
+REMOVE_TOKENS_IND = 5
+SUM_TOKENS_IND = 6
+DIFF_WITH_MAX_IND = 7
+SIMILARITY_IND = 8
 
 
 def init_argparser():
@@ -58,8 +58,8 @@ def find_max(rows):
 
     max = 0
     for row in rows:
-        if (row[SUM_TOKENS] > max):
-            max = row [SUM_TOKENS] # SUM_TOKENS is a constant defined at the beginning of the script
+        if (row[SUM_TOKENS_IND] > max):
+            max = row [SUM_TOKENS_IND] # SUM_TOKENS_IND is a constant defined at the beginning of the script
 
     return max
 
@@ -73,7 +73,7 @@ def complete_rows_with_missing_field(partialRows):
     print(max)
     rows = [] # this list will contain all completed row
     for partialRow in partialRows:
-        diffWithMax = max - partialRow[SUM_TOKENS] # SUM_TOKENS is a constant defined at the beginning of the script
+        diffWithMax = max - partialRow[SUM_TOKENS_IND] # SUM_TOKENS is a constant defined at the beginning of the script
         similarityPerc = (diffWithMax / max) * 100
         partialRow.append(diffWithMax)
         partialRow.append(similarityPerc) # now partial row has all missing field

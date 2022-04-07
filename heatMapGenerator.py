@@ -215,8 +215,8 @@ def main():
     title = fig.suptitle(csvFileName+' - SIMILARITY', verticalalignment = "center", fontproperties = font )
     title.set(color = 'darkred')
 
-    ax.set_ylabel(csvFileName.split('_')[0] + '- most recent top', color = 'mediumblue', fontsize = 24.0)
-    ax.set_xlabel(csvFileName.split('_')[1] + '- most recent right', color = 'mediumblue', fontsize = 24.0)
+    ax.set_ylabel(csvFileName.split('_')[0] , color = 'mediumblue', fontsize = 24.0)
+    ax.set_xlabel(csvFileName.split('_')[1] , color = 'mediumblue', fontsize = 24.0)
 
     fig.set_size_inches(24, 18)
 
