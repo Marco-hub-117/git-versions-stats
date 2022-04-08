@@ -100,7 +100,7 @@ def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_
     make_dir(resultDir)
     field = ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
         'ADD_TOKENS', 'REMOVE_TOKENS', 'SUM_TOKENS', 'DIFF_WITH_MAX', 'SIMILARITY [%]']
-    csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}.csv'
+    csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}_diff.csv'
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 

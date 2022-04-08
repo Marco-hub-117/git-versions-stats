@@ -187,7 +187,7 @@ def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_c
     make_dir(resultDir)
     field = ['FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2',
         'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'SIMILARITY [%]', 'LINES_MATCHES']
-    csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}.csv'
+    csvFileName = f'{Path(firstDir).name}_{Path(secondDir).name}_moss.csv'
     print(csvFileName)
     csvFilePath = init_csv_file(resultDir, csvFileName, field)
 
