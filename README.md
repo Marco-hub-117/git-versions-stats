@@ -1,7 +1,8 @@
 # Git Versions Stats
-This repository contain three different script:
+This repository contain four different script:
 - analyzer.py used to extract source code from Git repository
 - compareWithMoss.py used to send moss comparison between source code and to save the information retrieved into a csv file
+- compareWithDiff.py used to do comparison based on the diff command between reformatted C source code
 - heatMapGenerator.py used to visualize the csv file generated from the previous script into a heatmap
 
 # analyzer.py 
@@ -54,7 +55,7 @@ It will save the result into a **csv file** with the following **field**:
 
 - 'FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'SIMILARITY [%]', 'LINES_MATCHES'
 
-The **resulting csv** has the following **name** format: _firstDirName_secondDirName.csv_
+The **resulting csv** has the following **name** format: _firstDirName_secondDirName_moss.csv_
 
 When the script start it search into output directory if a csv file with the same name is already present and ask if you want to overwrite that file; if you don't, the script automatically search into that csv file all missing comparison, start to send moss requests of this missing comparison and append the result into that csv file.
 
@@ -68,8 +69,41 @@ When the script start it search into output directory if a csv file with the sam
 
 </details>
 
+# compareWithDiff.py
 
+<details><summary>compareWithDiff.py used to do comparison based on the diff command between reformatted C source code (Click to expand)</summary>
 
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Here a list of possible command and option for compareWithDiff.py
+
+**usage**: compareWithDiff.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outdir outdir]
+
+The following command show the **help** message: `python3 compareWithDiff.py --help`
+
+The script compare all .c source code contained into first directory passed with all the .c source code contained into second directory passed, using the diff command on reformatted source code.
+
+The **resulting csv** has the following **name** format: _firstDirName_secondDirName_diff.csv_
+
+It will save the result into a **csv file** with the following **field**:
+
+- 'FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'ADD_TOKENS', 'REMOVE_TOKENS', 'SUM_TOKENS', 'DIFF_WITH_MAX', 'SIMILARITY [%]'
+
+DIFF_WITH_MAX is the difference between the maximum in the columnn SUM_TOKENS and the SUM_TOKENS value in the row.
+
+SIMILARITY [%] is calculated through the ratio between DIFF_WITH_MAX value and the maximum in the columnn SUM_TOKENS multiplied by 100.
+
+When the script start it search into output directory if a csv file with the same name is already present and ask if you want to overwrite that file.
+
+**usage**: compareWithDiff.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outdir outdir]
+
+- The option `--firstdir firstdir` ( -f is the short version of the command ) is used to specify the first directory that contain c source code
+
+- The option `--seconddir seconddir` ( -s is the short version of the command )is used to specify the second directory that contain c source code
+
+- The option `--outdir outdir` ( -o is the short version of the command ) is used to specify the output directory that will contain the csv result file (Default = "./diff_compare_result")
+
+</details>
 
 
 #  heatMapGenerator.py
