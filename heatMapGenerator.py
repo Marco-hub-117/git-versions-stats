@@ -212,7 +212,7 @@ def main():
     font = {'weight': 'semibold',
             'size': '28.0'
             }
-    title = fig.suptitle(csvFileName+' - SIMILARITY', verticalalignment = "center", fontproperties = font )
+    title = fig.suptitle(csvFileName+' - SIMILARITY', verticalalignment = "top", fontproperties = font )
     title.set(color = 'darkred')
 
     ax.set_ylabel(csvFileName.split('_')[0] , color = 'mediumblue', fontsize = 24.0)
