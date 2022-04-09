@@ -5,7 +5,7 @@ This repository contain four different script:
 - compareWithDiff.py used to do comparison based on the diff command between reformatted C source code
 - heatMapGenerator.py used to visualize the csv file generated from the previous script into a heatmap
 
-Run `pip install -r requirements.txt` to **install al**l required **packages**.
+Run `pip install -r requirements.txt` to **install all** required **packages**.
 
 # analyzer.py 
 <details><summary>analyzer.py used to extract source code from Git repository (Click to expand) </summary>
