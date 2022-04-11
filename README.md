@@ -119,6 +119,8 @@ You can simply run `pip install matplotlib` and `pip install numpy` to do it.
 
 You may need to run `sudo apt-get install python3-tk` to show the pyplot figure gui.
 
+This script will search TIME_STAMP_1, TIME_STAMP_2 and SIMILARITY [%] field, and plot a heatmap based on the SIMILARITY value. It order the value so that you can find the older version of the source code on top right position.
+
 **usage**: `heatMapGenerator.py [-h] [--filetoread filetoread] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT]`
 
 The following command show the **help** message: `python3 heatMapGenerator.py --help`
