@@ -17,6 +17,8 @@ def init_argparser():
                         help='specify the path in wich save the result heatmap. If not specified, the script doesn\'t save the image ')
     parser.add_argument('--imageformat', '-format', metavar='IMAGE FORMAT', default = 'png', choices = ['png', 'svg', 'pdf'],
                         help='specify the format of the saved image. Choices are %(choices)s. Default = "%(default)s" ')
+    parser.add_argument('--suppressplot', '-suppress', action = 'store_true',
+                        help='Don´t show the plot figure GUI')
 
     return parser
 
@@ -188,6 +190,7 @@ def main():
     destFile = args.filetoread
     pathToSaveImage = args.saveimage
     imageFormat = args.imageformat
+    suppressPlot = args.suppressplot
 
     csvFileName = (Path(destFile).name).split('.')[0]
 
@@ -226,7 +229,8 @@ def main():
         plt.savefig(os.path.join(pathToSaveImage, csvFileName+'.'+imageFormat),
                 format = imageFormat, dpi = 300.0)
 
-    plt.show()
+    if (not suppressPlot):
+        plt.show()
 
 
 
