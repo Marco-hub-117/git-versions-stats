@@ -7,7 +7,7 @@ This repository contain four different script:
 
 Run `pip install -r requirements.txt` to **install all** required **packages**.
 
-# analyzer.py 
+# analyzer.py
 <details><summary>analyzer.py used to extract source code from Git repository (Click to expand) </summary>
 ------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ The following is a **summary example** for analyzer.py:
 
 `python3 analyzer.py -d path-to-git-rep -o example-analyzer-output -fs '*.py'`
 
-The following command will extract all the *.py source code commited into path-to-git-rep repository and will save them into example-analyzer-output directory 
+The following command will extract all the *.py source code commited into path-to-git-rep repository and will save them into example-analyzer-output directory
 </details>
 
 
@@ -41,7 +41,7 @@ The following command will extract all the *.py source code commited into path-t
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
-This script use [Moss plagiarism detection](https://theory.stanford.edu/~aiken/moss/) to perform the comparison. The moss requests are sends with [mosspy](https://github.com/soachishti/moss.py) package. 
+This script use [Moss plagiarism detection](https://theory.stanford.edu/~aiken/moss/) to perform the comparison. The moss requests are sends with [mosspy](https://github.com/soachishti/moss.py) package.
 
 To **install** this r**equired package** simply run `pip install mosspy`
 
@@ -51,9 +51,9 @@ Here a list of possible command and option for compareWithMoss.py
 
 The following command show the **help** message: `python3 compareWithMoss.py --help`
 
-The script compare all .c source code contained into first directory passed with all the .c source code contained into second directory passed, sending moss request and retrieving the result from the resulting moss web page. 
+The script compare all .c source code contained into first directory passed with all the .c source code contained into second directory passed, sending moss request and retrieving the result from the resulting moss web page.
 
-It will save the result into a **csv file** with the following **field**: 
+It will save the result into a **csv file** with the following **field**:
 
 - 'FILE_NAME_1', 'FILE_NAME_2', 'TIME_STAMP_1', 'TIME_STAMP_2', 'RESULT_URL', 'PERC_SIM_1 [%]', 'PERC_SIM_2 [%]', 'SIMILARITY [%]', 'LINES_MATCHES'
 
@@ -121,7 +121,7 @@ You may need to run `sudo apt-get install python3-tk` to show the pyplot figure 
 
 This script will search TIME_STAMP_1, TIME_STAMP_2 and SIMILARITY [%] field, and plot a heatmap based on the SIMILARITY value. It order the value so that you can find the older version of the source code on top right position.
 
-**usage**: `heatMapGenerator.py [-h] [--filetoread filetoread] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT]`
+**usage**: `heatMapGenerator.py [-h] [--filetoread filetoread] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot]`
 
 The following command show the **help** message: `python3 heatMapGenerator.py --help`
 
@@ -131,7 +131,8 @@ The following command show the **help** message: `python3 heatMapGenerator.py --
 
 - the option `--imageformat IMAGE FORMAT` specify the format of the saved image. Choices are **png, svg, pdf**. Default = "png"
 
+- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present 
+
 [Here](https://gitlab-rbl.unipv.it/source-code-analysis/git-versions-stats/-/tree/main/heatMapSavedImage/lim-160) you can find some example of resulting image.
 
 </details>
-
