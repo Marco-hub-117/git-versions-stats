@@ -101,13 +101,12 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', file
             clonedRepo.checkout_tree(clonedRepo.get(commit_info.hex))
 
             necessaryFile = find_necessary_file(tmpdirname, fileSearchedList)
-            print('NECESSARY:', necessaryFile)
-            print('####################')
 
             for src in necessaryFile:
                 committedFileName = Path(src).name
                 destFilenName = os.path.join(outdir, commit_info.date+'_'+commit_info.hex+'_'+committedFileName)
                 shutil.copy(src, destFilenName)
+                print('Extracted file: {}'.format(destFilenName))
 
             clonedRepo.reset(last.id, pygit2.GIT_RESET_HARD)
 
