@@ -157,7 +157,7 @@ def heatmap(data, row_labels, col_labels, ax=None,
 
     # Create colorbar
     cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
-    cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+    cbar.ax.set_ylabel(cbarlabel, fontsize = 16.0, rotation=-90, va="bottom")
 
     # Show all ticks and label them with the respective list entries.
     # ax.set_xticks(np.arange(data.shape[1]), labels=col_labels, fontsize = 'small')
@@ -184,13 +184,14 @@ def heatmap(data, row_labels, col_labels, ax=None,
     return im, cbar
 
 
-def main():
-    parser = init_argparser()
-    args = parser.parse_args()
-    destFile = args.filetoread
-    pathToSaveImage = args.saveimage
-    imageFormat = args.imageformat
-    suppressPlot = args.suppressplot
+def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', suppressPlot = False):
+    """
+        This function Plot the heatmap from data retrieved from destFile.
+        It will save the image into pathToSaveImage if not None.
+        You specifiy the image format.
+        If suppressPlot is True, don't show the plot GUI.
+    """
+
 
     csvFileName = (Path(destFile).name).split('.')[0]
 
@@ -231,6 +232,17 @@ def main():
 
     if (not suppressPlot):
         plt.show()
+
+
+def main():
+    parser = init_argparser()
+    args = parser.parse_args()
+    destFile = args.filetoread
+    pathToSaveImage = args.saveimage
+    imageFormat = args.imageformat
+    suppressPlot = args.suppressplot
+
+    plot_and_save_image(destFile, pathToSaveImage, imageFormat, suppressPlot)
 
 
 
