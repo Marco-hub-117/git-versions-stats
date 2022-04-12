@@ -11,10 +11,10 @@ def init_argparser():
     """Initialize the command line parser."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--firstdir', '-f', metavar='firstdir', default = './first',
-                        help='First directory containing git repository from which to extract c source code. Default = "%(default)s"')
-    parser.add_argument('--seconddir', '-s', metavar='seconddir', default = './second',
-                        help='Second directory containing git repository from which to extract c source code. Default = "%(default)s"')
+    parser.add_argument('firstdir',
+                        help='First git repository to compare')
+    parser.add_argument('seconddir',
+                        help='Second git repository to compare')
     parser.add_argument('--outputdir', '-o', metavar='outdir', default = './mainOutput',
                             help='Directory containing the output. the output are csv file and heatmap image. Default = "%(default)s"')
     parser.add_argument('--saveimage', '-si', metavar='PATH-TO-SAVE-TO', default = None,
