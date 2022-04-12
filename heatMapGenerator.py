@@ -222,7 +222,7 @@ def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', s
     ax.set_ylabel(csvFileName.split('_')[0] , color = 'mediumblue', fontsize = 24.0)
     ax.set_xlabel(csvFileName.split('_')[1] , color = 'mediumblue', fontsize = 24.0)
 
-    fig.set_size_inches(24, 18)
+    fig.set_size_inches(20, 15)
 
     if (pathToSaveImage is not None):
         print(f'Saving image into {pathToSaveImage}')
