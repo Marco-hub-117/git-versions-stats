@@ -107,14 +107,17 @@ def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_
     reformatCodePath = os.path.join(resultDir, 'reformat_code')
     make_dir(reformatCodePath)
 
+    allComparsionNumber = len(firstAllFileList) * len(secondAllFileList)
+    completedComparison = 0
     partialRows = []
     for firstFile in firstAllFileList:
         for secondFile in secondAllFileList:
             addToken, remToken = compare_code(firstFile, secondFile, reformatCodePath)
             partialRow = [firstFile, secondFile, get_date_from_file_name(firstFile),
                 get_date_from_file_name(secondFile), addToken, remToken, addToken+remToken]
-            print(partialRow)
             partialRows.append(partialRow)
+            completedComparison += 1
+            print('Completed Comparison:', completedComparison, '/', allComparsionNumber)
 
     rows = complete_rows_with_missing_field(partialRows)
 
