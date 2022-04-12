@@ -88,6 +88,7 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', file
         return None
     source_dir_name = "source_file"
     basename = Path(repDirectory).name
+    basename, suffix = os.path.splitext(basename)
     outdir = os.path.join(outDirectory, basename, source_dir_name)
     if (not Path(outdir).exists()):
         make_dir(outdir)
