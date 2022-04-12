@@ -7,3 +7,5 @@ ab0383-lim-50
 supportModules/**/__pycache__
 internal_compare_result/reformat_code
 test_diff_comparison/
+__pycache__
+mainOutput
