@@ -22,7 +22,7 @@ def init_argparser():
     parser.add_argument('--imageformat', '-format', metavar='IMAGE FORMAT', default = 'png', choices = ['png', 'svg', 'pdf'],
                         help='specify the format of the saved image. Choices are %(choices)s. Default = "%(default)s" ')
     parser.add_argument('--suppressplot', '-suppress', action = 'store_true',
-                        help='Don´t show the plot figure GUI')
+                        help='Do not show the plot figure GUI')
 
     return parser
 
