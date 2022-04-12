@@ -5,6 +5,8 @@ This repository contain four different script:
 - compareWithDiff.py used to do comparison based on the diff command between reformatted C source code
 - heatMapGenerator.py used to visualize the csv file generated from the previous script into a heatmap
 
+Than **main.py** is used to extract C source code from two different repository, compare the extracted source code with compareWithDiff.py script and plot the result into an heatmap.
+
 Run `pip install -r requirements.txt` to **install all** required **packages**.
 
 # analyzer.py
@@ -134,5 +136,31 @@ The following command show the **help** message: `python3 heatMapGenerator.py --
 - the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present 
 
 [Here](https://gitlab-rbl.unipv.it/source-code-analysis/git-versions-stats/-/tree/main/heatMapSavedImage/lim-160) you can find some example of resulting image.
+
+</details>
+
+# main.py
+<details><summary>main.py is used to extract C source code from two different repository, compare the extracted source code with compareWithDiff.py script and plot the result into an heatmap.(Click to expand)</summary>
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Run `pip install -r requirements.txt` to **install all** required **packages**.
+
+**usage**: main.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outputdir outdir] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot]
+
+The following command show the **help** message: `python3 main.py --help`
+
+- The Option `--firstdir firstdir` is used to specify the first directory containing git repository from which to extract c source code. Default = "./first"
+
+- The Option `--seconddir seconddir`, is used to specify the second directory containing git repository from which to extract c source code. Default = "./second"
+
+- The option `--outputdir outdir`, is used to specify the irectory containing the output. the output are csv file and heatmap image. Default ="./mainOutput"
+
+- The option `--saveimage PATH-TO-SAVE-TO`, specify the path in wich to save the result heatmap. If not specified, the script doesn't save the image
+
+- The option `--imageformat IMAGE FORMAT`, specify the format of the saved image. Choices are png, svg, pdf. Default = "png"
+  
+- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present 
+
 
 </details>
