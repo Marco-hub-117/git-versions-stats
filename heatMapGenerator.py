@@ -193,7 +193,7 @@ def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', s
     """
 
 
-    csvFileName = (Path(destFile).name).split('.')[0]
+    csvFileName, suffix = os.path.splitext(Path(destFile).name)
 
     firstDateList, secondDateList = get_date_lists(destFile)
 
