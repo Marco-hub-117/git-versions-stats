@@ -120,6 +120,7 @@ def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_
 
     add_rows_to_csv(csvFilePath, rows)
 
+    return csvFilePath
 
 
 def main():
@@ -134,8 +135,8 @@ def main():
     elif (not Path(secondDir).is_dir()):
         print(f"Attention, {secondDir} doesn't exist")
     else :
-        compare_with_diff_all_file(firstDir, secondDir, outdir)
-        print("ALL COMPARISON COMPLETED")
+        csvFilePath = compare_with_diff_all_file(firstDir, secondDir, outdir)
+        print("ALL COMPARISON COMPLETED, OUTPUT FILE IS:", csvFilePath)
 
     quit()
 
