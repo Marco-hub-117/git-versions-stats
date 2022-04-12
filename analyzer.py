@@ -85,7 +85,7 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', file
 
     if pygit2.discover_repository(repDirectory) is None:
         print(f'{repDirectoy} is not a repository')
-        return False
+        return None
     source_dir_name = "source_file"
     basename = Path(repDirectory).name
     outdir = os.path.join(outDirectory, basename, source_dir_name)
@@ -110,7 +110,7 @@ def copy_all_committed_file(repDirectory='.',outDirectory='analyzerOutput', file
 
             clonedRepo.reset(last.id, pygit2.GIT_RESET_HARD)
 
-    return True
+    return outdir
 
 def copy_all_commit_from_all_repository(directoryWithReps='.',outDirectory='analyzerOutput'):
     """
@@ -167,7 +167,8 @@ def main():
     print('WORKDIR:', workdir)
     print('OUTDIR:', outdir)
     print('FILESEARCHEDLIST', fileSearchedList)
-    copy_all_committed_file(workdir, outdir, fileSearchedList)
+    outdir = copy_all_committed_file(workdir, outdir, fileSearchedList)
+    print(outdir)
     # compile_all_file(outdir)
 
 if __name__ == '__main__':
