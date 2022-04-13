@@ -204,8 +204,6 @@ def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', s
 
     fig, ax = plt.subplots()
 
-    norm = mpl.colors.BoundaryNorm(np.linspace(0, 100, 10), 11, extend = 'min')
-
     cmap = mpl.colors.ListedColormap(["lightcyan", "aquamarine", "springgreen",
                                     "greenyellow", "yellow", "gold", "darkorange",
                                     "orangered", "red", "darkred"])
