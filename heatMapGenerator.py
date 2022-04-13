@@ -188,8 +188,8 @@ def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', s
     """
         This function Plot the heatmap from data retrieved from destFile.
         It will save the image into pathToSaveImage if not None.
-        You specifiy the image format.
-        If suppressPlot is True, don't show the plot GUI.
+        You can specify the image format with the curresponding argument.
+        If suppressPlot is True, do not show the plot GUI.
     """
 
 
