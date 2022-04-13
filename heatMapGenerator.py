@@ -105,7 +105,7 @@ def get_similarity_matrix(csvFileToRead):
         return None
 
     firstDateList, secondDateList = get_date_lists(csvFileToRead)
-    simMatrix = np.zeros((len(firstDateList), len(secondDateList)))
+    simMatrix = np.full((len(firstDateList), len(secondDateList)), -10.0)
 
     print(simMatrix.shape)
 
@@ -204,11 +204,17 @@ def plot_and_save_image(destFile, pathToSaveImage = None, imageFormat = 'png', s
 
     fig, ax = plt.subplots()
 
+    norm = mpl.colors.BoundaryNorm(np.linspace(0, 100, 10), 11, extend = 'min')
+
     cmap = mpl.colors.ListedColormap(["lightcyan", "aquamarine", "springgreen",
                                     "greenyellow", "yellow", "gold", "darkorange",
                                     "orangered", "red", "darkred"])
 
-    cbar_kw = { 'ticks': [x for x in range(0,110,10)], 'drawedges': True }
+    cmap.set_under(color = 'black')
+
+    cbar_kw = { 'ticks': [x for x in range(0,110,10)],
+                'drawedges': True,
+                'extend': 'min' }
 
     im, cbar = heatmap(percSimMatrix, firstDateList, secondDateList, ax=ax,
                        cmap=cmap, cbar_kw = cbar_kw, vmin = 0.0, vmax = 100.0, cbarlabel="Percentage of similarity [%]")
