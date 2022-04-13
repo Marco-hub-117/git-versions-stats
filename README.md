@@ -146,13 +146,13 @@ The following command show the **help** message: `python3 heatMapGenerator.py --
 
 Run `pip install -r requirements.txt` to **install all** required **packages**.
 
-**usage**: main.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outputdir outdir] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot]
+**usage**: main.py [-h] [--outputdir outdir] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot] firstdir seconddir
 
 The following command show the **help** message: `python3 main.py --help`
 
-- The Option `--firstdir firstdir` is used to specify the first directory containing git repository from which to extract c source code. Default = "./first"
+- `fisrtdir` is the first Git repository to compare
 
-- The Option `--seconddir seconddir`, is used to specify the second directory containing git repository from which to extract c source code. Default = "./second"
+- `seconddir` is the second Git repository to compare
 
 - The option `--outputdir outdir`, is used to specify the irectory containing the output. the output are csv file and heatmap image. Default ="./mainOutput"
 
