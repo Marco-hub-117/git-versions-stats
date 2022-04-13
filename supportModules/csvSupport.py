@@ -10,11 +10,12 @@ def make_dir(dirName):
         print(f'la cartella {dirName} è già presente')
 
 
-def init_csv_file(destDirectory, fileName, field):
+def init_csv_file(destDirectory, fileName, field, overwrite = False):
     """
         Init a .csv file with the first row containing field passed.
         field must be a list.
         return the destination file path
+        Always overwite the csv if overwite == True
     """
     make_dir(destDirectory)
     if not Path(fileName).suffix == ".csv":
@@ -22,8 +23,8 @@ def init_csv_file(destDirectory, fileName, field):
 
     destFile = os.path.join(destDirectory,fileName)
 
-    if os.path.isfile(destFile):
-        overwrite = input(f'Do you want to overwrite the file {destFile}? \n(ok, y, yes) per confermare\n')
+    if os.path.isfile(destFile) and not overwrite:
+        overwrite = input(f'Do you want to overwrite the file {destFile}? \n(ok, y, yes) to confirm\n')
         if overwrite in ['ok', 'y', 'yes']:
             with open(destFile, 'w', newline = '') as csvfile:
                 writer = csv.writer(csvfile)
