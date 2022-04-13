@@ -21,10 +21,10 @@ SIMILARITY_IND = 8
 def init_argparser():
     """Initialize the command line parser."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--firstdir', '-f', metavar='firstdir', default = './first',
-                        help='First directory containing .c file to compare. Default = "%(default)s"')
-    parser.add_argument('--seconddir', '-s', metavar='seconddir', default = './second',
-                        help='second directory containing .c file to compare. Default = "%(default)s"')
+    parser.add_argument('firstdir',
+                        help='First directory containing .c file to compare.')
+    parser.add_argument('seconddir',
+                        help='Second directory containing .c file to compare.')
     parser.add_argument('--outdir', '-o', metavar='outdir', default = './diff_compare_result',
                             help='Output directory containing the csv file with compare results. Default = "%(default)s"')
     return parser
