@@ -29,8 +29,8 @@ def init_argparser():
                         help='Second directory containing .c file to compare.')
     parser.add_argument('--outdir', '-o', metavar='outdir', default = './diff_compare_result',
                             help='Output directory containing the csv file with compare results. Default = "%(default)s"')
-    parser.add_argument('--timedelta', '-d', metavar='TIMEDELTA', default = None ,
-                            help='Sepcify the max time delta between commit time of source code. Compare all source code if not specified ')
+    parser.add_argument('--timedelta', '-d', metavar='TIMEDELTA', default = None , type = int,
+                            help='Sepcify the max time delta in seconds between commit time of source code. Compare all source code if not specified ')
 
     return parser
 
@@ -112,8 +112,12 @@ def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_
     reformatCodePath = os.path.join(resultDir, 'reformat_code')
     make_dir(reformatCodePath)
 
+    if (timeDelta is None):
+        allComparisonsList = compListMan.get_all_possible_comparison(firstAllFileList, secondAllFileList)
+    else:
+        allComparisonsList = compListMan.get_comparison_based_delta(firstAllFileList, secondAllFileList, timeDelta)
+
     print('Retrieving already completed comparison, if present')
-    allComparisonsList = compListMan.get_all_possible_comparison(firstAllFileList, secondAllFileList)
     retrievedComparisonList = compListMan.retrieve_completed_comparison(csvFilePath)
     allMissingComparison = compListMan.get_difference_between_list(allComparisonsList, retrievedComparisonList)
 
@@ -146,13 +150,14 @@ def main():
     firstDir = args.firstdir
     secondDir = args.seconddir
     outdir = args.outdir
+    timedelta = args.timedelta
 
     if (not Path(firstDir).is_dir()):
         print(f"Attention, {firstDir} doesn't exist")
     elif (not Path(secondDir).is_dir()):
         print(f"Attention, {secondDir} doesn't exist")
     else :
-        csvFilePath = compare_with_diff_all_file(firstDir, secondDir, outdir)
+        csvFilePath = compare_with_diff_all_file(firstDir, secondDir, outdir, timedelta)
         print("ALL COMPARISON COMPLETED, OUTPUT FILE IS:", csvFilePath)
 
     quit()
