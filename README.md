@@ -133,7 +133,7 @@ The following command show the **help** message: `python3 heatMapGenerator.py --
 
 - the option `--imageformat IMAGE FORMAT` specify the format of the saved image. Choices are **png, svg, pdf**. Default = "png"
 
-- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present 
+- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present
 
 [Here](https://gitlab-rbl.unipv.it/source-code-analysis/git-versions-stats/-/tree/main/heatMapSavedImage/lim-160) you can find some example of resulting image.
 
@@ -146,7 +146,10 @@ The following command show the **help** message: `python3 heatMapGenerator.py --
 
 Run `pip install -r requirements.txt` to **install all** required **packages**.
 
-**usage**: main.py [-h] [--outputdir outdir] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot] firstdir seconddir
+When the script start it search into output directory if a csv file with the same name is already present and ask if you want to overwrite that file.
+If you don't the script automatically search all missing comparison and complete the missing comparison appending the resulting new row, if present.
+
+**usage**: main.py [-h] [--outputdir outdir] [--timedelta TIMEDELTA] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot] firstdir seconddir
 
 The following command show the **help** message: `python3 main.py --help`
 
@@ -156,11 +159,13 @@ The following command show the **help** message: `python3 main.py --help`
 
 - The option `--outputdir outdir`, is used to specify the irectory containing the output. the output are csv file and heatmap image. Default ="./mainOutput"
 
+- The option `--timedelta TIMEDELTA`, is used to specify the max difference in seconds between the commit time stamp of source code
+
 - The option `--saveimage PATH-TO-SAVE-TO`, specify the path in wich to save the result heatmap. If not specified, the script doesn't save the image
 
 - The option `--imageformat IMAGE FORMAT`, specify the format of the saved image. Choices are png, svg, pdf. Default = "png"
-  
-- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present 
+
+- the script doesn't show the plot figure if the option `--suppressplot` or `-suppress` is present
 
 
 </details>
