@@ -1,4 +1,17 @@
 import csv
+import os
+from datetime import datetime, timedelta
+
+def get_date_from_file_name(fileName):
+    """
+        This function return a string representing the date contained in .c
+        fileName passed. fileName should respect the following format:
+        parentDir/YYYY-MM-DD_HH-MM-SS_COMMITHEX.c
+    """
+    fileName = os.path.basename(fileName)
+    fileNameParts = fileName.split('_')
+    return fileNameParts[0] + '_' + fileNameParts[1]
+
 
 def get_N_elements_from_list(list, N = 50, sort = False):
     """
@@ -34,6 +47,31 @@ def get_all_possible_comparison(firstFileList, secondFileList):
             resultList.append(couple)
 
     return resultList
+
+
+def get_comparison_based_delta(firstFileList, secondFileList, deltaSeconds):
+    """
+        Return all comparison based on timeDelta specified in seconds.
+        The two file list contain file name with the following format:
+        parentDir/YYYY-MM-DD_HH-MM-SS_COMMITHEX_FILENAME.c
+        The returned list is a nested list, with the inner list
+        containing the comparison needed so the two file that
+        will be comparared will have timeDelta difference time
+        based on the commit time retrieved from the fileName.
+    """
+    resultList = []
+    timeDelta = timedelta(seconds = deltaSeconds)
+    print('Time delta needed:',timeDelta)
+    for firstFile in firstFileList:
+        for secondFile in secondFileList:
+            firstDate = datetime.strptime(get_date_from_file_name(firstFile), '%Y-%m-%d_%H-%M-%S')
+            secondDate = datetime.strptime(get_date_from_file_name(secondFile), '%Y-%m-%d_%H-%M-%S')
+            currentDelta = firstDate - secondDate
+            if (abs(currentDelta) <= timeDelta):
+                resultList.append([firstFile, secondFile])
+
+    return resultList
+
 
 def retrieve_completed_comparison(csvFileName):
 
