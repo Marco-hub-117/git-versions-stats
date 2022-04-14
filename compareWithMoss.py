@@ -10,6 +10,7 @@ import time
 import subprocess
 from supportModules.sendMossRequest import MossHandlingThread
 from supportModules.csvSupport import init_csv_file, add_rows_to_csv
+from supportModules.comparisonListManager import get_N_elements_from_list, get_all_possible_comparison, retrieve_completed_comparison, get_difference_between_list
 
 userid = 719337169
 
@@ -110,64 +111,6 @@ def get_valid_rows_from_url(url, firstFileGroup, secondFileGroup, necessaryCompa
 
     return valid_rows
 
-def get_N_elements_from_list(list, N = 50, sort = False):
-    """
-        Return a list containing N elements from the list passed.
-        If N is greater than the number of elements of the list passed,
-        return the original list.
-        If sort is True return a reverse sorted list
-    """
-
-    if (sort):
-        list.sort(reverse = True)
-    if (N >= len(list)):
-        return list
-
-    resultList = []
-    i = 0
-    multiplier = len(list) / N
-    currentIndex = 0
-    while (currentIndex < len(list)):
-        resultList.append(list[currentIndex])
-        i += 1
-        currentFloatIndex = (i * multiplier)
-        currentIndex = int (currentFloatIndex // 1)
-
-    return resultList
-
-def get_all_possible_comparison(firstFileList, secondFileList):
-
-    resultList = []
-    for firstFile in firstFileList:
-        for secondFile in secondFileList:
-            couple = [firstFile, secondFile]
-            resultList.append(couple)
-
-    return resultList
-
-def retrieve_completed_comparison(csvFileName):
-
-    with open(csvFileName, 'r', newline = '') as csvfile:
-        reader = csv.reader(csvfile)
-        field = next(reader)
-        retrievedComparisonList = []
-        for row in reader:
-            couple = [row[0], row[1]]
-            retrievedComparisonList.append(couple)
-
-    return retrievedComparisonList
-
-def get_difference_between_list(firstList, secondList):
-    """ Return a list containing all element of first list that are not present
-    in second list
-    """
-
-    differenceList = []
-    for elem in firstList:
-        if elem not in secondList:
-            differenceList.append(elem)
-
-    return differenceList
 
 def compare_with_moss_all_file(firstDir, secondDir, resultDir = './script_moss_compare'):
     """
