@@ -99,11 +99,11 @@ SIMILARITY [%] is calculated through the ratio between DIFF_WITH_MAX value and t
 
 When the script start it search into output directory if a csv file with the same name is already present and ask if you want to overwrite that file.
 
-**usage**: compareWithDiff.py [-h] [--firstdir firstdir] [--seconddir seconddir] [--outdir outdir]
+**usage**: compareWithDiff.py [-h] [--outdir outdir] firstdir seconddir
 
-- The option `--firstdir firstdir` ( -f is the short version of the command ) is used to specify the first directory that contain c source code
+- `firstdir` is used to specify the first directory that contain c source code
 
-- The option `--seconddir seconddir` ( -s is the short version of the command )is used to specify the second directory that contain c source code
+- `seconddir` is used to specify the second directory that contain c source code
 
 - The option `--outdir outdir` ( -o is the short version of the command ) is used to specify the output directory that will contain the csv result file (Default = "./diff_compare_result")
 
