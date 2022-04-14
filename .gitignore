@@ -9,3 +9,4 @@ internal_compare_result/reformat_code
 test_diff_comparison/
 __pycache__
 mainOutput
+diff_compare_result/reformat_code
