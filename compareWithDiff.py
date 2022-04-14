@@ -3,8 +3,10 @@ import os
 import glob
 import argparse
 
-from supportModules.csvSupport import init_csv_file, add_rows_to_csv
+from supportModules.csvSupport import init_csv_file, add_rows_to_csv, list_all_rows_from_csv
 from supportModules.compareCode.compare_code import compare_code
+import supportModules.comparisonListManager as compListMan
+
 
 # The following are the csv fields with their indexes
 FILE_NAME_1_IND = 0
@@ -58,8 +60,8 @@ def find_max(rows):
 
     max = 0
     for row in rows:
-        if (row[SUM_TOKENS_IND] > max):
-            max = row [SUM_TOKENS_IND] # SUM_TOKENS_IND is a constant defined at the beginning of the script
+        if (int(row[SUM_TOKENS_IND]) > max):
+            max = int(row [SUM_TOKENS_IND]) # SUM_TOKENS_IND is a constant defined at the beginning of the script
 
     return max
 
@@ -73,7 +75,7 @@ def complete_rows_with_missing_field(partialRows):
     print(max)
     rows = [] # this list will contain all completed row
     for partialRow in partialRows:
-        diffWithMax = max - partialRow[SUM_TOKENS_IND] # SUM_TOKENS is a constant defined at the beginning of the script
+        diffWithMax = max - int(partialRow[SUM_TOKENS_IND]) # SUM_TOKENS is a constant defined at the beginning of the script
         similarityPerc = (diffWithMax / max) * 100
         partialRow.append(diffWithMax)
         partialRow.append(similarityPerc) # now partial row has all missing field
@@ -107,19 +109,28 @@ def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_
     reformatCodePath = os.path.join(resultDir, 'reformat_code')
     make_dir(reformatCodePath)
 
-    allComparsionNumber = len(firstAllFileList) * len(secondAllFileList)
-    completedComparison = 0
-    partialRows = []
-    for firstFile in firstAllFileList:
-        for secondFile in secondAllFileList:
-            addToken, remToken = compare_code(firstFile, secondFile, reformatCodePath)
-            partialRow = [firstFile, secondFile, get_date_from_file_name(firstFile),
-                get_date_from_file_name(secondFile), addToken, remToken, addToken+remToken]
-            partialRows.append(partialRow)
-            completedComparison += 1
-            print('Completed Comparison:', completedComparison, '/', allComparsionNumber)
+    print('Retrieving already completed comparison, if present')
+    allComparisonsList = compListMan.get_all_possible_comparison(firstAllFileList, secondAllFileList)
+    retrievedComparisonList = compListMan.retrieve_completed_comparison(csvFilePath)
+    allMissingComparison = compListMan.get_difference_between_list(allComparisonsList, retrievedComparisonList)
 
-    rows = complete_rows_with_missing_field(partialRows)
+    missingComparisonNumber = len(allMissingComparison)
+    completedComparisonNumber = 0
+
+    print('Comparison start')
+    for missingComparison in allMissingComparison:
+        addToken, remToken = compare_code(missingComparison[0], missingComparison[1], reformatCodePath)
+        partialRow = [[missingComparison[0], missingComparison[1], get_date_from_file_name(missingComparison[0]),
+                    get_date_from_file_name(missingComparison[1]), addToken, remToken, addToken+remToken]] # need to be a nested list
+        add_rows_to_csv(csvFilePath, partialRow)
+        completedComparisonNumber += 1
+        print(f'{completedComparisonNumber}/{missingComparisonNumber}')
+
+    oldField, retrievedRowsList = list_all_rows_from_csv(csvFilePath)
+
+    rows = complete_rows_with_missing_field(retrievedRowsList)
+
+    csvFilePath = init_csv_file(resultDir, csvFileName, field, overwrite = True)
 
     add_rows_to_csv(csvFilePath, rows)
 
