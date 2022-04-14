@@ -29,6 +29,9 @@ def init_argparser():
                         help='Second directory containing .c file to compare.')
     parser.add_argument('--outdir', '-o', metavar='outdir', default = './diff_compare_result',
                             help='Output directory containing the csv file with compare results. Default = "%(default)s"')
+    parser.add_argument('--timedelta', '-d', metavar='TIMEDELTA', default = None ,
+                            help='Sepcify the max time delta between commit time of source code. Compare all source code if not specified ')
+
     return parser
 
 
@@ -84,7 +87,7 @@ def complete_rows_with_missing_field(partialRows):
     return rows
 
 
-def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_result'):
+def compare_with_diff_all_file(firstDir, secondDir, resultDir = './diff_compare_result', timeDelta = None):
     """
         create a csv file into resultDir containing information retrieved
         from internal comparison. It will contain information between the comparison
