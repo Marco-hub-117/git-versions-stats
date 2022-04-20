@@ -149,13 +149,13 @@ Run `pip install -r requirements.txt` to **install all** required **packages**.
 When the script start it search into output directory if a csv file with the same name is already present and ask if you want to overwrite that file.
 If you don't the script automatically search all missing comparison and complete the missing comparison appending the resulting new row, if present.
 
-**usage**: main.py [-h] [--outputdir outdir] [--timedelta TIMEDELTA] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot] firstdir seconddir
+**usage**: main.py [-h] [--outputdir outdir] [--timedelta TIMEDELTA] [--saveimage PATH-TO-SAVE-TO] [--imageformat IMAGE FORMAT] [--suppressplot] repo1 repo2
 
 The following command show the **help** message: `python3 main.py --help`
 
-- `fisrtdir` is the first Git repository to compare
+- `repo1` is the first Git repository to compare
 
-- `seconddir` is the second Git repository to compare
+- `repo2` is the second Git repository to compare
 
 - The option `--outputdir outdir`, is used to specify the irectory containing the output. the output are csv file and heatmap image. Default ="./mainOutput"
 
