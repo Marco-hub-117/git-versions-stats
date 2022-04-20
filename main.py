@@ -12,9 +12,9 @@ def init_argparser():
     """Initialize the command line parser."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('firstdir',
+    parser.add_argument('repo1',
                         help='First git repository to compare')
-    parser.add_argument('seconddir',
+    parser.add_argument('repo2',
                         help='Second git repository to compare')
     parser.add_argument('--outputdir', '-o', metavar='outdir', default = './mainOutput',
                             help='Directory containing the output. the output are csv file and heatmap image. Default = "%(default)s"')
@@ -41,8 +41,8 @@ def main():
     startTime = datetime.now()
     parser = init_argparser()
     args = parser.parse_args()
-    firstdir = args.firstdir
-    seconddir = args.seconddir
+    repo1 = args.repo1
+    repo2 = args.repo2
     outputdir = args.outputdir
     timedelta = args.timedelta
     pathToSaveImage = args.saveimage
@@ -50,8 +50,8 @@ def main():
     suppressPlot = args.suppressplot
 
     analyzerOutputDir = os.path.join(outputdir, 'analyzerOutput')
-    firstSourceFileDir = analyzer.copy_all_committed_file(firstdir, analyzerOutputDir)
-    secondSourceFileDir = analyzer.copy_all_committed_file(seconddir, analyzerOutputDir)
+    firstSourceFileDir = analyzer.copy_all_committed_file(repo1, analyzerOutputDir)
+    secondSourceFileDir = analyzer.copy_all_committed_file(repo2, analyzerOutputDir)
     print(firstSourceFileDir, secondSourceFileDir)
 
     csvFile = compareWithDiff.compare_with_diff_all_file(os.path.dirname(firstSourceFileDir), os.path.dirname(secondSourceFileDir), outputdir, timedelta)
